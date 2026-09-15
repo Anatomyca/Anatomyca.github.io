@@ -1,2 +1,15 @@
 node_modules/
-.DS_Store
+dist/
+dist-ssr/
+*.local
+
+# Raw upstream archives. Never committed: the BodyParts3D IS-A archive is
+# 136 MB, past GitHub's 100 MB hard limit. Processed chunks go in public/atlas.
+data-cache/
+
+# Test and tooling output
+coverage/
+playwright-report/
+test-results/
+.vite/
+*.tsbuildinfo
