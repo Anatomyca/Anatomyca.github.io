@@ -1,0 +1,78 @@
+{
+  "$comment": "Every dataset this project ships or depends on, with its licence and the exact attribution the licensor requires. scripts/check-licences.mjs fails the build if a shipped asset is not listed here, or carries a licence outside the approved set. Attribution strings are rendered from this file rather than retyped, so the wording cannot drift.",
+  "approvedLicences": ["MIT", "CC0-1.0", "CC-BY-4.0", "CC-BY-SA-4.0"],
+  "forbiddenLicences": [
+    {
+      "id": "CC-BY-NC-4.0",
+      "reason": "A NonCommercial term would spread to the whole geometry pack and block school and government reuse. Applies to the University of Dundee inner ear and the Open3Dmodel muscle textures; commission or generate original textures instead."
+    },
+    {
+      "id": "CC-BY-NC-SA-4.0",
+      "reason": "Same NonCommercial problem, plus ShareAlike."
+    }
+  ],
+  "sources": {
+    "anatomyca-procedural": {
+      "label": "Anatomyca procedural geometry",
+      "licence": "MIT",
+      "licenceUrl": "https://opensource.org/licenses/MIT",
+      "attribution": "Procedural anatomy generated for Anatomyca.",
+      "grade": "C",
+      "url": "https://github.com/Anatomyca/Anatomyca.github.io",
+      "shipped": true,
+      "notes": "Recognisable teaching shapes in correct anatomical positions, generated in code. Not dissection-grade, and labelled Grade C in the interface for that reason."
+    },
+    "bodyparts3d": {
+      "label": "BodyParts3D Release 4.0",
+      "licence": "CC-BY-4.0",
+      "licenceUrl": "https://creativecommons.org/licenses/by/4.0/",
+      "attribution": "BodyParts3D, © The Database Center for Life Science licensed under CC Attribution 4.0 International",
+      "grade": "B",
+      "url": "https://dbarchive.biosciencedbc.jp/en/bodyparts3d/",
+      "shipped": false,
+      "notes": "Attribution wording is fixed by the licensor and must be reproduced verbatim. The README's licence section links the older CC BY-SA 2.1 Japan deed; the licence page is authoritative. Geometry derives from one adult male volunteer's MRI (the TARO voxel model), so proportions are not universal. Downloads are also covered by the NBDC terms of service.",
+      "citation": "Mitsuhashi N., Fujieda K., Tamura T., Kawamoto S., Takagi T., Okubo K. (2009). BodyParts3D: 3D structure database for anatomical concepts. Nucleic Acids Research 37(suppl_1): D782-D785.",
+      "citationLicence": "CC-BY-NC-2.0-UK, which differs from the data licence: cite the paper, do not reuse its figures."
+    },
+    "open3dmodel": {
+      "label": "Open3Dmodel",
+      "licence": "CC-BY-SA-4.0",
+      "licenceUrl": "https://creativecommons.org/licenses/by-sa/4.0/",
+      "attribution": "Open3Dmodel, by the anatomy departments of Leiden UMC, UMC Utrecht, Maastricht, KU Leuven, Amsterdam UMC, Radboud UMC and Ghent, licensed under CC BY-SA 4.0",
+      "grade": "A",
+      "url": "https://anatomytool.org/open3dmodel-about",
+      "shipped": false,
+      "notes": "Every structure reviewed by one to three subject-expert anatomists against the standard reference works. ShareAlike: including it makes the whole geometry pack CC BY-SA 4.0. Its own web viewer is GPL-3.0 and must not be copied into this MIT codebase. Its muscle textures are NonCommercial and are excluded."
+    },
+    "z-anatomy": {
+      "label": "Z-Anatomy",
+      "licence": "CC-BY-SA-4.0",
+      "licenceUrl": "https://creativecommons.org/licenses/by-sa/4.0/",
+      "attribution": "Z-Anatomy, licensed under CC BY-SA 4.0",
+      "grade": "B",
+      "url": "https://www.z-anatomy.com/",
+      "shipped": false,
+      "notes": "Retopologised and expanded BodyParts3D; not systematically anatomist-reviewed. Used to fill gaps between the reviewed and base layers."
+    },
+    "hubmap": {
+      "label": "HuBMAP 3D Reference Organ Set for Female v1.5",
+      "licence": "CC-BY-4.0",
+      "licenceUrl": "https://creativecommons.org/licenses/by/4.0/",
+      "attribution": "HuBMAP 3D Reference Organ Set for Female v1.5, Browne K. and Schlehlein H. (2023), credited to HuBMAP and the Visible Human Project",
+      "grade": "B",
+      "url": "https://doi.org/10.48539/HBM352.BTSQ.586",
+      "shipped": false,
+      "notes": "Female reference body. Skeleton and muscle coverage is partial, which must be disclosed where it is used."
+    },
+    "wikidata": {
+      "label": "Wikidata",
+      "licence": "CC0-1.0",
+      "licenceUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+      "attribution": "Sinhala and Tamil label seeds from Wikidata (CC0)",
+      "grade": "C",
+      "url": "https://www.wikidata.org/wiki/Property:P1402",
+      "shipped": false,
+      "notes": "Community-contributed and often unreferenced. A seed and a coverage check, never an authority: no term reaches 'reviewed' status without named human expert review."
+    }
+  }
+}

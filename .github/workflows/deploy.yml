@@ -1,0 +1,67 @@
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      # Typecheck and lint before anything expensive runs.
+      - run: npm run check
+
+      # Data gates. Geometry is processed offline and committed, so CI only
+      # validates — it never has to run heavy mesh work inside the 10-minute
+      # deployment timeout.
+      - run: node scripts/validate-atlas.mjs
+      - run: node scripts/validate-terms.mjs
+      - run: node scripts/check-licences.mjs
+      - run: node scripts/check-coverage.mjs
+
+      - run: npm test
+
+      - run: npm run build
+        env:
+          PAGES_BASE: /
+
+      - run: node scripts/check-size-budget.mjs dist
+
+      # No server-side rewriting on Pages, so a deep link that escapes the
+      # hash router needs a static fallback.
+      - run: cp dist/index.html dist/404.html
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+
+  deploy:
+    # Only the default branch deploys; pull requests stop at the gates above.
+    if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

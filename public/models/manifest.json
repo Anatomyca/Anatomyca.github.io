@@ -1,0 +1,6 @@
+{
+  "_comment": "Optional real-mesh overrides. Empty by default: the atlas renders from procedural geometry with no download. To swap in licensed meshes, add a GLB under models/ and map its node names to structure ids here. See docs/adr/0002-procedural-seed-layer.md.",
+  "scale": 1,
+  "offset": [0, 0, 0],
+  "files": {}
+}

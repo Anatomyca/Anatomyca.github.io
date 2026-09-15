@@ -1,0 +1,5 @@
+FMA7088	FJ1234	Heart
+FMA7100	FJ1235	Right atrium
+FMA7101	FJ1236	Left atrium
+FMA9670	FJ2001	Kidney
+FMA7195		Thoracic cavity

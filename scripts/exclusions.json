@@ -1,0 +1,10 @@
+{
+  "$comment": "Structures deliberately not shipped. check-coverage.mjs fails on any structure that is neither shipped nor listed here with a reason, so 'ship every licensed mesh' is a gate rather than an intention. Each entry needs a reason from the allowed set.",
+  "allowedReasons": [
+    "duplicate-of-preferred-layer",
+    "noncommercial-licence",
+    "degenerate-geometry",
+    "not-yet-imported"
+  ],
+  "exclusions": []
+}
