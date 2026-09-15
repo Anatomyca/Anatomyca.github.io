@@ -1,62 +1,68 @@
 import { create } from 'zustand';
-import type { Language, Structure } from '../domain/types';
-import { SEED_STRUCTURES, SYSTEMS } from '../data/structures';
+import type { Language } from '../domain/types';
+import type { Bp3dManifest, Bp3dPart } from '../atlas/manifest';
+import { BP3D_SYSTEMS, LITE_SYSTEMS } from '../atlas/systems';
 import { buildHash, parseHash } from './deepLink';
+import { buildIndex, resolve, type AtlasIndex, type Selection } from '../atlas/selection';
 
 interface AtlasState {
   lang: Language;
+  manifest: Bp3dManifest | null;
   selected: string | null;
-  hidden: ReadonlySet<string>;
+  /** Systems the reader has asked to see. Geometry streams in per system. */
+  shown: ReadonlySet<string>;
+  loading: ReadonlySet<string>;
   isolate: boolean;
   xray: number;
-  clip: { axis: 'x' | 'y' | 'z'; amount: number };
   spin: boolean;
-  gradeAOnly: boolean;
   bookmarks: ReadonlySet<string>;
   ready: boolean;
 
-  byId(id: string): Structure | undefined;
-  visibleStructures(): readonly Structure[];
+  index: AtlasIndex | null;
+  partById(id: string): Bp3dPart | undefined;
+  selection(): Selection | null;
 
+  setManifest(manifest: Bp3dManifest): void;
   setLang(lang: Language): void;
   select(id: string | null): void;
-  toggleSystem(system: string, on: boolean): void;
+  setSystemShown(system: string, shown: boolean): void;
+  setLoading(system: string, loading: boolean): void;
   setIsolate(on: boolean): void;
   setXray(value: number): void;
-  setClip(axis: 'x' | 'y' | 'z', amount: number): void;
   setSpin(on: boolean): void;
-  setGradeAOnly(on: boolean): void;
   toggleBookmark(id: string): void;
   setBookmarks(ids: readonly string[]): void;
   setReady(ready: boolean): void;
   syncFromHash(hash: string): void;
 }
 
-const INDEX = new Map(SEED_STRUCTURES.map((s) => [s.id, s]));
-
-/** Systems outside the Lite set start hidden, so a first visit stays small. */
-const INITIALLY_HIDDEN = new Set(SYSTEMS.filter((s) => !s.inLite && s.id === 'none').map((s) => s.id));
+const ALL_SYSTEMS = new Set(BP3D_SYSTEMS.map((s) => s.id));
 
 export const useAtlas = create<AtlasState>((set, get) => ({
   lang: 'en',
+  manifest: null,
+  index: null,
   selected: null,
-  hidden: INITIALLY_HIDDEN,
+  // A first visit shows a recognisable body; the vascular trees alone are
+  // over a thousand structures and stream only when asked for.
+  shown: new Set(LITE_SYSTEMS),
+  loading: new Set<string>(),
   isolate: false,
   xray: 0,
-  clip: { axis: 'z', amount: 0 },
   spin: false,
-  gradeAOnly: false,
   bookmarks: new Set<string>(),
   ready: false,
 
-  byId: (id) => INDEX.get(id),
-
-  visibleStructures() {
-    const { hidden, gradeAOnly } = get();
-    return SEED_STRUCTURES.filter(
-      (s) => !hidden.has(s.system) && (!gradeAOnly || s.grade === 'A'),
-    );
+  partById(id) {
+    return get().index?.parts.get(id);
   },
+
+  selection() {
+    const { index, selected } = get();
+    return index && selected ? resolve(index, selected) : null;
+  },
+
+  setManifest: (manifest) => set({ manifest, index: buildIndex(manifest) }),
 
   setLang(lang) {
     set({ lang });
@@ -68,19 +74,24 @@ export const useAtlas = create<AtlasState>((set, get) => ({
     writeHash({ ...get(), selected: id });
   },
 
-  toggleSystem(system, on) {
-    const hidden = new Set(get().hidden);
-    if (on) hidden.delete(system);
-    else hidden.add(system);
-    set({ hidden });
-    writeHash({ ...get(), hidden });
+  setSystemShown(system, shown) {
+    const next = new Set(get().shown);
+    if (shown) next.add(system);
+    else next.delete(system);
+    set({ shown: next });
+    writeHash({ ...get(), shown: next });
+  },
+
+  setLoading(system, loading) {
+    const next = new Set(get().loading);
+    if (loading) next.add(system);
+    else next.delete(system);
+    set({ loading: next });
   },
 
   setIsolate: (on) => set({ isolate: on }),
   setXray: (value) => set({ xray: Math.min(1, Math.max(0, value)) }),
-  setClip: (axis, amount) => set({ clip: { axis, amount } }),
   setSpin: (on) => set({ spin: on }),
-  setGradeAOnly: (on) => set({ gradeAOnly: on }),
 
   toggleBookmark(id) {
     const bookmarks = new Set(get().bookmarks);
@@ -96,10 +107,9 @@ export const useAtlas = create<AtlasState>((set, get) => ({
     const route = parseHash(hash);
     const patch: Partial<AtlasState> = {};
     if (route.lang) patch.lang = route.lang;
-    if (route.structure && INDEX.has(route.structure)) patch.selected = route.structure;
+    if (route.structure) patch.selected = route.structure;
     if (route.systems) {
-      const shown = new Set(route.systems);
-      patch.hidden = new Set(SYSTEMS.filter((s) => !shown.has(s.id)).map((s) => s.id));
+      patch.shown = new Set(route.systems.filter((s) => ALL_SYSTEMS.has(s)));
     }
     set(patch);
   },
@@ -107,15 +117,16 @@ export const useAtlas = create<AtlasState>((set, get) => ({
 
 /**
  * Mirror state into the URL so any view can be pasted into a class group.
- * replaceState rather than pushState: turning a system on and off should not
- * fill the back button with steps a student has to press through.
+ * replaceState rather than pushState: toggling a system should not fill the
+ * back button with steps a reader has to press through.
  */
-function writeHash(state: Pick<AtlasState, 'lang' | 'selected' | 'hidden'>): void {
-  const shown = SYSTEMS.filter((s) => !state.hidden.has(s.id)).map((s) => s.id);
-  const hash = buildHash({
+function writeHash(state: Pick<AtlasState, 'lang' | 'selected' | 'shown'>): void {
+  const shown = [...state.shown];
+  const isDefault =
+    shown.length === LITE_SYSTEMS.length && LITE_SYSTEMS.every((s) => state.shown.has(s));
+  history.replaceState(null, '', buildHash({
     structure: state.selected,
     lang: state.lang,
-    systems: shown.length === SYSTEMS.length ? null : shown,
-  });
-  history.replaceState(null, '', hash);
+    systems: isDefault ? null : shown,
+  }));
 }

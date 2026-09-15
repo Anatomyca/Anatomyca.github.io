@@ -1,26 +1,31 @@
 import { useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { buildSearch } from '../search/index';
-import { SEED_STRUCTURES } from '../data/structures';
 import { useAtlas } from '../state/store';
+import { sentenceCase } from './text';
 
 /**
- * Trilingual search. The index is rebuilt when the language changes so that
- * result labels are in the reader's language, but matching always spans all
- * three scripts plus romanised input — a student who types "hadawatha" on an
- * English keyboard finds the heart.
+ * Trilingual search over every structure in the atlas.
+ *
+ * The index is rebuilt when the language changes so result labels follow the
+ * reader, but matching always spans all three scripts plus romanised input —
+ * a student who types "hadawatha" on an English keyboard finds the heart.
  */
 export function SearchBox() {
   const { t } = useTranslation();
   const lang = useAtlas((s) => s.lang);
+  const manifest = useAtlas((s) => s.manifest);
   const select = useAtlas((s) => s.select);
   const [query, setQuery] = useState('');
   const [open, setOpen] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  const search = useMemo(() => buildSearch(SEED_STRUCTURES, lang), [lang]);
+  const search = useMemo(
+    () => (manifest ? buildSearch(manifest.parts, lang, manifest.concepts) : null),
+    [manifest, lang],
+  );
   const results = useMemo(
-    () => (query.trim() ? search.search(query, 8) : []),
+    () => (search && query.trim() ? search.search(query, 8) : []),
     [query, search],
   );
 
@@ -49,8 +54,10 @@ export function SearchBox() {
         aria-controls="search-results"
         autoComplete="off"
         spellCheck={false}
+        disabled={!search}
         className="w-full rounded-lg border border-edge bg-panel px-4 py-2 text-base
-                   placeholder:text-muted focus:border-saffron focus:outline-none"
+                   placeholder:text-muted focus:border-saffron focus:outline-none
+                   disabled:opacity-50"
       />
       {open && query.trim() && (
         <ul
@@ -67,7 +74,7 @@ export function SearchBox() {
                 onClick={() => choose(hit.id as string)}
                 className="w-full px-4 py-2 text-left hover:bg-edge"
               >
-                {hit['label'] as string}
+                {sentenceCase(hit['label'] as string)}
               </button>
             </li>
           ))}

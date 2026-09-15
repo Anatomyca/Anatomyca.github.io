@@ -6,15 +6,26 @@ stored once in `data-sources.json` and rendered from there, so it cannot drift.
 
 ## Geometry currently shipped
 
-**Anatomyca procedural geometry** — MIT.
-Every shape in the current release is generated in code. These are
-recognisable teaching shapes in correct anatomical positions, not
-dissection-grade surfaces, and they are labelled **Grade C** throughout the
-interface for exactly that reason.
+**BodyParts3D Release 4.0** — CC BY 4.0. The whole body: 2,234 element
+meshes across fifteen systems, 2,288,268 triangles simplified from 6,681,030,
+carrying 3,432 named FMA concepts. Graded **B** throughout — a published
+reference dataset, not individually reviewed by anatomists.
+
+> BodyParts3D, © The Database Center for Life Science licensed under CC Attribution 4.0 International
+
+**Human Atlas** by ashemag — MIT. The conversion of those meshes for the web:
+millimetres and Z-up to metres and Y-up, simplification with meshoptimizer at
+a 0.2% per-structure relative error bound, normals quantised to signed 16-bit,
+and packing into binary chunks. The batched-rendering approach — one merged
+mesh per system with per-part state in a data texture — is also adapted from
+that project. Anatomyca re-chunks the output by body system so each system is
+a separate download; the vertex layout is unchanged.
+
+https://github.com/ashemag/human-atlas
 
 ## Sources this project builds on
 
-**BodyParts3D** — CC BY 4.0:
+**BodyParts3D** — CC BY 4.0, cited above:
 
 > BodyParts3D, © The Database Center for Life Science licensed under CC Attribution 4.0 International
 
@@ -37,6 +48,17 @@ coverage check, never as an authority.
 
 ## A note on the reference body
 
-The male lineage of every model above traces back to one young adult
-volunteer's MRI. Proportions will not match every body, and the atlas should
-never be read as giving clinical measurements.
+BodyParts3D is an adult male reference anatomy, segmented from the TARO MRI
+volume of one young adult volunteer and refined by medical illustrators.
+Proportions will not match every body; epiphysial lines are visible in the
+bones because of the donor's age; and it is not a complete model of every
+human structure or variation. The atlas should never be read as giving
+clinical measurements.
+
+## A note on the names
+
+BodyParts3D supplies English names only. Sinhala and Tamil names in this
+atlas come from Anatomyca's own compiled list and currently reach 35 of the
+3,432 concepts. Every other structure shows its English name, and the
+interface says so rather than implying a translation exists. No term is
+marked reviewed without a named reviewer behind it.

@@ -1,37 +1,49 @@
 import { expect, test, type Page } from '@playwright/test';
 
-/** The body takes a moment to generate; wait for the boot overlay to clear. */
+/**
+ * Geometry streams in per system, so "ready" means the boot overlay has gone
+ * and the canvas is live — not that every system has arrived.
+ */
 async function waitForAtlas(page: Page) {
-  await page.goto('/');
   await expect(page.locator('canvas')).toBeVisible();
-  await expect(page.getByRole('heading', { name: 'Anatomyca' })).toBeVisible();
-  await page.waitForFunction(() => !document.body.textContent?.includes('Building the body'), null, { timeout: 30_000 });
+  await page.waitForFunction(
+    () => !document.body.textContent?.includes('Building the body'),
+    null,
+    { timeout: 120_000 },
+  );
+}
+
+async function open(page: Page, path = '/') {
+  await page.goto(path);
+  await waitForAtlas(page);
 }
 
 test('renders the atlas without console errors', async ({ page }) => {
   const errors: string[] = [];
   page.on('pageerror', (e) => errors.push(e.message));
-  await waitForAtlas(page);
+  await open(page);
   expect(errors).toEqual([]);
 });
 
-test('finds a structure by name and opens it', async ({ page }) => {
-  await waitForAtlas(page);
+test('finds the heart, which is a concept with no mesh of its own', async ({ page }) => {
+  await open(page);
   await page.getByRole('searchbox').fill('heart');
   await page.getByRole('option').first().click();
   await expect(page.locator('#detail h2')).toHaveText('Heart');
+  // The heart is 83 element meshes gathered under one FMA concept.
+  await expect(page.locator('#detail header p')).toContainText('83');
 });
 
-test('shows an accuracy grade for every structure opened', async ({ page }) => {
-  await waitForAtlas(page);
+test('shows provenance and an accuracy grade for what it opens', async ({ page }) => {
+  await open(page);
   await page.getByRole('searchbox').fill('liver');
   await page.getByRole('option').first().click();
-  // Provenance is always visible: that is the project's accuracy promise.
   await expect(page.locator('#detail')).toContainText(/Accuracy [ABC]/);
+  await expect(page.locator('#detail')).toContainText('BodyParts3D');
 });
 
-test('switches to Sinhala and translates the structure name', async ({ page }) => {
-  await waitForAtlas(page);
+test('switches to Sinhala and translates a name that has one', async ({ page }) => {
+  await open(page);
   await page.getByRole('searchbox').fill('heart');
   await page.getByRole('option').first().click();
   await page.getByRole('button', { name: 'සි' }).click();
@@ -40,26 +52,33 @@ test('switches to Sinhala and translates the structure name', async ({ page }) =
 });
 
 test('finds a structure typed in Tamil script', async ({ page }) => {
-  await waitForAtlas(page);
+  await open(page);
   await page.getByRole('searchbox').fill('இதயம்');
   await expect(page.getByRole('option').first()).toBeVisible();
 });
 
 test('puts the open structure in a shareable link', async ({ page }) => {
-  await waitForAtlas(page);
-  await page.getByRole('searchbox').fill('kidney');
+  await open(page);
+  await page.getByRole('searchbox').fill('spleen');
   await page.getByRole('option').first().click();
-  expect(page.url()).toContain('#/s/kidneys');
+  expect(page.url()).toMatch(/#\/s\/FMA\d+/);
 });
 
 test('opens on the right structure from a pasted link', async ({ page }) => {
-  await page.goto('/#/s/liver?lang=ta');
-  await expect(page.locator('#detail h2')).toHaveText('கல்லீரல்');
+  // FMA7088 is the heart.
+  await open(page, '/#/s/FMA7088?lang=ta');
+  await expect(page.locator('#detail h2')).toHaveText('இதயம்');
   await expect(page.locator('html')).toHaveAttribute('lang', 'ta');
 });
 
+test('lists every body system in the rail', async ({ page }) => {
+  await open(page);
+  // Fifteen systems, each a separate download the reader chooses to make.
+  await expect(page.locator('nav[aria-label] button')).toHaveCount(15);
+});
+
 test('never scrolls sideways, at any viewport', async ({ page }) => {
-  await waitForAtlas(page);
+  await open(page);
   const overflows = await page.evaluate(
     () => document.documentElement.scrollWidth > document.documentElement.clientWidth + 1,
   );

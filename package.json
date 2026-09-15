@@ -19,7 +19,8 @@
     "atlas:wikidata": "node scripts/harvest-wikidata.mjs",
     "atlas:search": "node scripts/build-search-index.mjs",
     "atlas:validate": "node scripts/validate-atlas.mjs && node scripts/validate-terms.mjs && node scripts/check-licences.mjs && node scripts/check-coverage.mjs",
-    "atlas:all": "npm run atlas:terms && npm run atlas:search && npm run atlas:validate"
+    "atlas:all": "npm run atlas:terms && npm run atlas:search && npm run atlas:validate",
+    "atlas:chunk": "node scripts/chunk-by-system.mjs && node scripts/trim-manifest.mjs"
   },
   "dependencies": {
     "i18next": "^26.4.2",

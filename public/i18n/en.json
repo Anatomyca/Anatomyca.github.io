@@ -54,5 +54,6 @@
   "gradeC": "Teaching shape, not dissection-grade",
   "provisional": "Name not yet reviewed",
   "reportError": "Report an error",
-  "disclaimer": "Anatomyca is an educational reference, not a diagnostic or clinical tool. The model shows one reference anatomy and does not show every human variation."
+  "disclaimer": "Anatomyca is an educational reference, not a diagnostic or clinical tool. The model shows one reference anatomy and does not show every human variation.",
+  "partOf": "Part of"
 }
