@@ -1,4 +1,4 @@
-# Manava Atlas
+# Anatomyca
 
 A 3D map of the human body for Sri Lankan students, teachers and patients.
 Turn the model, tap a bone or an organ, and read what it does — with the name
@@ -7,10 +7,10 @@ in English, Sinhala and Tamil.
 Built to run as a plain static site on GitHub Pages: **no build step, no
 bundler, no server, no accounts, no tracking.** Clone it, push it, done.
 
-> **Name.** `Manava Atlas` is a placeholder that reads cleanly in all three
-> languages (මානව / மானுட — "human"). Change `APP.name` in `src/config.js`,
-> the `<title>` in `index.html` and the `name` fields in
-> `manifest.webmanifest`; nothing else reads it.
+> **Name.** The app is called `Anatomyca`. To rename it, change `APP.name` in
+> `src/config.js`, the `<title>` and the header/boot labels in `index.html`,
+> and the `name` / `short_name` fields in `manifest.webmanifest`; nothing else
+> reads it.
 
 ---
 
@@ -67,7 +67,7 @@ command is needed.
 ### After deploying
 
 The service worker caches the app on first visit. When you push changes, bump
-`CACHE` in `sw.js` (e.g. `manava-atlas-v2`) so returning visitors get the new
+`CACHE` in `sw.js` (e.g. `anatomyca-v2`) so returning visitors get the new
 version instead of the cached one.
 
 ## How it is put together
