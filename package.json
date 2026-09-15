@@ -1,10 +1,55 @@
 {
   "name": "anatomyca",
+  "version": "0.1.0",
   "private": true,
   "type": "module",
-  "description": "A 3D map of the human body, in English, Sinhala and Tamil. Static site — no build step.",
+  "description": "A trilingual, offline-capable, mobile-first 3D human anatomy atlas for Sri Lanka.",
+  "license": "MIT",
   "scripts": {
-    "start": "python3 -m http.server 8080",
-    "verify": "node tools/verify.mjs"
+    "dev": "vite",
+    "build": "tsc -b && vite build",
+    "preview": "vite preview",
+    "check": "tsc -b --noEmit && eslint .",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "e2e": "playwright test",
+    "atlas:hierarchy": "node scripts/build-hierarchy.mjs",
+    "atlas:fetch": "node scripts/fetch-bodyparts3d.mjs",
+    "atlas:terms": "node scripts/merge-terms.mjs",
+    "atlas:wikidata": "node scripts/harvest-wikidata.mjs",
+    "atlas:search": "node scripts/build-search-index.mjs",
+    "atlas:validate": "node scripts/validate-atlas.mjs && node scripts/validate-terms.mjs && node scripts/check-licences.mjs && node scripts/check-coverage.mjs",
+    "atlas:all": "npm run atlas:terms && npm run atlas:search && npm run atlas:validate"
+  },
+  "dependencies": {
+    "i18next": "^26.4.2",
+    "idb-keyval": "^6.3.0",
+    "minisearch": "^7.2.0",
+    "qrcode": "^1.5.4",
+    "react": "^19.3.0",
+    "react-dom": "^19.3.0",
+    "react-i18next": "^17.0.14",
+    "three": "^0.180.0",
+    "zustand": "^5.0.15"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "@playwright/test": "^1.63.0",
+    "@tailwindcss/vite": "^4.3.3",
+    "@types/node": "^26.5.1",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "@types/three": "^0.186.0",
+    "@vitejs/plugin-react": "^6.1.1",
+    "eslint": "^10.10.0",
+    "eslint-plugin-react-hooks": "^7.1.1",
+    "globals": "^17.12.0",
+    "jsdom": "^30.0.1",
+    "tailwindcss": "^4.3.3",
+    "typescript": "^6.0.3",
+    "typescript-eslint": "^8.70.0",
+    "vite": "^8.3.0",
+    "vite-plugin-pwa": "^1.3.0",
+    "vitest": "^5.0.1"
   }
 }

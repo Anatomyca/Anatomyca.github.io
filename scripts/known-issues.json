@@ -1,0 +1,4 @@
+{
+  "$comment": "Known defects, shown inline in the app rather than hidden. An independent maintainer of a BodyParts3D mirror chose release 3.0 over 4.0 because 4.0 appeared to have intersecting skin and muscle areas; anything validate-geometry finds and we cannot fix is recorded here so a reader sees it.",
+  "issues": []
+}
