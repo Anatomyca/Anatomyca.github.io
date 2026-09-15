@@ -356,6 +356,15 @@ export function createViewer(canvas) {
     });
   }
 
+  /* ── render state ─────────────────────────────────────────── */
+  let dirty = true;
+  let dpr = Math.min(devicePixelRatio, 2);
+  let slowFrames = 0;
+  let lastFrame = performance.now();
+
+  function invalidate() { dirty = true; }
+  api.invalidate = invalidate;
+
   /* ── resize ───────────────────────────────────────────────── */
   function resize() {
     const w = canvas.clientWidth || 1;
@@ -369,14 +378,6 @@ export function createViewer(canvas) {
   resize();
 
   /* ── loop ─────────────────────────────────────────────────── */
-  let dirty = true;
-  let dpr = Math.min(devicePixelRatio, 2);
-  let slowFrames = 0;
-  let lastFrame = performance.now();
-
-  function invalidate() { dirty = true; }
-  api.invalidate = invalidate;
-
   function tick(now) {
     requestAnimationFrame(tick);
 
