@@ -1,6 +1,6 @@
 {
-  "name": "Manava Atlas",
-  "short_name": "Manava",
+  "name": "Anatomyca",
+  "short_name": "Anatomyca",
   "description": "A 3D map of the human body, with organ names in English, Sinhala and Tamil.",
   "start_url": "./",
   "scope": "./",

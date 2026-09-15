@@ -3,9 +3,9 @@
  * index.html and you are done — nothing else reads the name.
  */
 export const APP = {
-  name: 'Manava Atlas',
+  name: 'Anatomyca',
   tagline: 'a 3D map of the human body',
-  repo: 'https://github.com/your-username/manava-atlas',
+  repo: 'https://github.com/Anatomyca/Anatomyca.github.io',
 };
 
 /** Body systems, in the order they appear in the rail. */

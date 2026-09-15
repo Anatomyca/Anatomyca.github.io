@@ -1,6 +1,6 @@
 /* Offline support. Bump CACHE whenever you deploy and old copies clear
    themselves on the next visit. */
-const CACHE = 'manava-atlas-v1';
+const CACHE = 'anatomyca-v1';
 
 const CORE = [
   './', './index.html', './styles.css', './manifest.webmanifest', './assets/icon.svg',
