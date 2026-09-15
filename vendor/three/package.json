@@ -1,0 +1,6 @@
+{
+  "name": "three",
+  "version": "0.186.0",
+  "type": "module",
+  "exports": { ".": "./three.module.js", "./addons/*": "./addons/*" }
+}

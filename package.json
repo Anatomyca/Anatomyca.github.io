@@ -1,0 +1,10 @@
+{
+  "name": "manava-atlas",
+  "private": true,
+  "type": "module",
+  "description": "A 3D map of the human body, in English, Sinhala and Tamil. Static site — no build step.",
+  "scripts": {
+    "start": "python3 -m http.server 8080",
+    "verify": "node tools/verify.mjs"
+  }
+}
