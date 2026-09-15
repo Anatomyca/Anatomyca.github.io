@@ -1,0 +1,242 @@
+[
+ {
+  "id": "FJ2541",
+  "name": "Trachea",
+  "conceptId": "FMA7394",
+  "system": "respiratory",
+  "chunk": 10,
+  "positions": 734532,
+  "normals": 748596,
+  "indices": 755628,
+  "vertexCount": 1172,
+  "indexCount": 6588,
+  "bounds": [
+   [
+    -0.013124100000000001,
+    1.3632011999999998,
+    -0.022634
+   ],
+   [
+    0.012814500000000001,
+    1.4735512,
+    0.010131000000000001
+   ]
+  ]
+ },
+ {
+  "id": "FJ3145",
+  "name": "Left kidney",
+  "conceptId": "FMA7205",
+  "system": "urinary",
+  "chunk": 14,
+  "positions": 17060,
+  "normals": 26204,
+  "indices": 30776,
+  "vertexCount": 762,
+  "indexCount": 4536,
+  "bounds": [
+   [
+    0.0328399,
+    1.0626052000000001,
+    -0.0404086
+   ],
+   [
+    0.09038299999999999,
+    1.1685512,
+    0.0001850000000000046
+   ]
+  ]
+ },
+ {
+  "id": "FJ3147",
+  "name": "Right kidney",
+  "conceptId": "FMA7204",
+  "system": "urinary",
+  "chunk": 14,
+  "positions": 68656,
+  "normals": 77620,
+  "indices": 82104,
+  "vertexCount": 747,
+  "indexCount": 4440,
+  "bounds": [
+   [
+    -0.0875754,
+    1.0449232,
+    -0.035299899999999995
+   ],
+   [
+    -0.030427600000000003,
+    1.1493512,
+    0.011855000000000004
+   ]
+  ]
+ },
+ {
+  "id": "FJ3149",
+  "name": "Urinary bladder",
+  "conceptId": "FMA15900",
+  "system": "urinary",
+  "chunk": 14,
+  "positions": 108380,
+  "normals": 109892,
+  "indices": 110648,
+  "vertexCount": 126,
+  "indexCount": 672,
+  "bounds": [
+   [
+    -0.0341466,
+    0.8678432,
+    -0.043474700000000005
+   ],
+   [
+    0.0326238,
+    0.9081002000000001,
+    0.028240000000000015
+   ]
+  ]
+ },
+ {
+  "id": "FJ3289",
+  "name": "Mandible",
+  "conceptId": "FMA52748",
+  "system": "skeletal",
+  "chunk": 0,
+  "positions": 6038616,
+  "normals": 6053100,
+  "indices": 6060344,
+  "vertexCount": 1207,
+  "indexCount": 7044,
+  "bounds": [
+   [
+    -0.0538459,
+    1.4997412,
+    -0.010146299999999997
+   ],
+   [
+    0.0525541,
+    1.5842112,
+    0.07383199999999998
+   ]
+  ]
+ },
+ {
+  "id": "FJ1781",
+  "name": "Cerebellum",
+  "conceptId": "FMA67944",
+  "system": "nervous",
+  "chunk": 2,
+  "positions": 1932688,
+  "normals": 1965388,
+  "indices": 1981740,
+  "vertexCount": 2725,
+  "indexCount": 15714,
+  "bounds": [
+   [
+    -0.000648386,
+    1.5653712,
+    -0.0878257
+   ],
+   [
+    0.0526099,
+    1.6186212,
+    -0.0315525
+   ]
+  ]
+ },
+ {
+  "id": "FJ2563",
+  "name": "Esophagus",
+  "conceptId": "FMA7131",
+  "system": "digestive",
+  "chunk": 9,
+  "positions": 132968,
+  "normals": 135044,
+  "indices": 136084,
+  "vertexCount": 173,
+  "indexCount": 888,
+  "bounds": [
+   [
+    -0.00881063,
+    1.1941012,
+    -0.03361270000000001
+   ],
+   [
+    0.0236032,
+    1.4685012000000002,
+    0.024263999999999994
+   ]
+  ]
+ },
+ {
+  "id": "FJ3131",
+  "name": "Diaphragm",
+  "conceptId": "FMA13295",
+  "system": "muscular",
+  "chunk": 4,
+  "positions": 19743436,
+  "normals": 19845064,
+  "indices": 19895880,
+  "vertexCount": 8469,
+  "indexCount": 45222,
+  "bounds": [
+   [
+    -0.122329,
+    1.0639631999999999,
+    -0.0740842
+   ],
+   [
+    0.120863,
+    1.2706912,
+    0.105323
+   ]
+  ]
+ },
+ {
+  "id": "FJ2817",
+  "name": "Gallbladder",
+  "conceptId": "FMA7202",
+  "system": "digestive",
+  "chunk": 9,
+  "positions": 1419324,
+  "normals": 1427112,
+  "indices": 1431008,
+  "vertexCount": 649,
+  "indexCount": 3876,
+  "bounds": [
+   [
+    -0.0632817,
+    1.1291811999999999,
+    0.03015100000000001
+   ],
+   [
+    -0.0268404,
+    1.1695912,
+    0.07855999999999999
+   ]
+  ]
+ },
+ {
+  "id": "FJ3178",
+  "name": "Body of sternum",
+  "conceptId": "FMA7487",
+  "system": "skeletal",
+  "chunk": 0,
+  "positions": 2780948,
+  "normals": 2811080,
+  "indices": 2826148,
+  "vertexCount": 2511,
+  "indexCount": 8430,
+  "bounds": [
+   [
+    -0.023614899999999998,
+    1.2577612,
+    0.065166
+   ],
+   [
+    0.0239556,
+    1.3677512,
+    0.11383199999999999
+   ]
+  ]
+ }
+]

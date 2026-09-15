@@ -2,11 +2,15 @@
 /**
  * Terminology gate.
  *
- * The tiering exists because full expert review of 3,432 concepts in two
- * languages is a multi-year job. Tier 1 — everything in the O/L and A/L
- * syllabuses — is the part that must be right, so this check fails the build
- * if a Tier 1 structure claims a reviewed name without a named reviewer
- * behind it. Nothing may promote itself to 'reviewed'.
+ * The atlas ships 2,234 meshes and 3,432 concepts with English names from
+ * BodyParts3D. Sinhala and Tamil names come from this project's own seed
+ * list, and full expert review in two languages is a multi-year job — so the
+ * seed is tiered, and this check fails the build if any term claims a
+ * reviewed name without a named reviewer behind it. Nothing may promote
+ * itself to 'reviewed'; only a person can.
+ *
+ * It also reports how far the trilingual layer reaches into the shipped
+ * anatomy, so the gap is visible rather than implied.
  */
 
 
@@ -67,6 +71,31 @@ async function main() {
     }
   }
 
+  // How much of the shipped anatomy the trilingual layer actually reaches.
+  let reach = '';
+  try {
+    const { readFile } = await import('node:fs/promises');
+    const atlas = JSON.parse(await readFile('public/atlas/bodyparts3d.json', 'utf8'));
+    const { variants } = JSON.parse(await readFile('src/data/name-variants.json', 'utf8'));
+
+    // Same matching rule as src/atlas/names.ts, over the same data file.
+    const norm = (s) => s.toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();
+    const known = new Set();
+    for (const s of structures) {
+      if (!s.names.si && !s.names.ta) continue;
+      known.add(norm(s.names.en));
+      for (const v of variants[s.id] ?? []) known.add(norm(v));
+    }
+    const namedConcepts = atlas.concepts.filter((c) => known.has(norm(c.name))).length;
+    const namedMeshes = atlas.parts.filter((p) => known.has(norm(p.name))).length;
+    reach =
+      `  trilingual reach: ${namedConcepts} of ${atlas.concepts.length} concepts, ` +
+      `${namedMeshes} of ${atlas.parts.length} meshes.\n` +
+      '  Everything else shows its English name until a reviewer supplies one.\n';
+  } catch {
+    // The geometry is optional for this check; the term rules still apply.
+  }
+
   const tier1 = structures.filter((s) => s.tier === 1);
   const reviewed = Object.fromEntries(LANGS.map((lang) => [
     lang, tier1.filter((s) => s.status?.[lang] === 'reviewed').length,
@@ -74,7 +103,7 @@ async function main() {
 
   process.stdout.write(
     `Terminology: ${structures.length} structures, ${tier1.length} in Tier 1.\n` +
-    LANGS.map((l) => `  ${l}: ${reviewed[l]}/${tier1.length} reviewed`).join('\n') + '\n',
+    LANGS.map((l) => `  ${l}: ${reviewed[l]}/${tier1.length} reviewed`).join('\n') + '\n' + reach,
   );
 
   if (problems.length > 0) {

@@ -1,62 +1,99 @@
 import { useEffect, useRef } from 'react';
-import { createViewer, type Viewer } from '../three/viewer';
+import { createScene, type AnatomyScene } from '../atlas/scene';
 import { useAtlas } from '../state/store';
 
 /**
- * The 3D canvas. React owns the DOM node; the viewer owns everything inside
- * it, and the two talk through a ref rather than through re-renders — a
- * three.js scene must not be rebuilt every time a panel opens.
+ * The 3D canvas.
+ *
+ * React owns the DOM node; the scene owns everything inside it, and the two
+ * talk through a ref rather than through re-renders — a three.js scene must
+ * not be rebuilt every time a panel opens.
  */
-export function Viewport({ onProgress }: { onProgress?: (fraction: number) => void }) {
+export function Viewport() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const viewerRef = useRef<Viewer | null>(null);
+  const sceneRef = useRef<AnatomyScene | null>(null);
 
   const selected = useAtlas((s) => s.selected);
-  const hidden = useAtlas((s) => s.hidden);
+  const shown = useAtlas((s) => s.shown);
   const isolate = useAtlas((s) => s.isolate);
   const xray = useAtlas((s) => s.xray);
-  const clip = useAtlas((s) => s.clip);
   const spin = useAtlas((s) => s.spin);
   const select = useAtlas((s) => s.select);
   const setReady = useAtlas((s) => s.setReady);
+  const setManifest = useAtlas((s) => s.setManifest);
+  const setLoading = useAtlas((s) => s.setLoading);
 
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
+    let disposed = false;
+    let scene: AnatomyScene | null = null;
 
-    const viewer = createViewer(canvas);
-    viewerRef.current = viewer;
-    viewer.onSelect = (id) => select(id);
+    void (async () => {
+      scene = await createScene(canvas, { onSelect: (id) => select(id) });
+      if (disposed) { scene.dispose(); return; }
+      sceneRef.current = scene;
+      setManifest(scene.manifest);
 
-    let cancelled = false;
-    void viewer.build((fraction) => onProgress?.(fraction)).then(() => {
-      if (cancelled) return;
+      // Stream the opening systems one at a time, so the first of them is on
+      // screen while the rest are still arriving.
+      for (const system of useAtlas.getState().shown) {
+        if (disposed) return;
+        setLoading(system, true);
+        try {
+          await scene.loadSystem(system);
+        } finally {
+          setLoading(system, false);
+        }
+        setReady(true);
+      }
       setReady(true);
-      void viewer.loadModels();
-    });
+    })();
 
     return () => {
-      cancelled = true;
-      viewer.dispose();
-      viewerRef.current = null;
+      disposed = true;
+      sceneRef.current?.dispose();
+      sceneRef.current = null;
     };
-    // Built once. Later state changes are pushed through the effects below.
+    // Built once; later state changes are pushed through the effects below.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  useEffect(() => { viewerRef.current?.select(selected, { focus: false }); }, [selected]);
-  useEffect(() => { viewerRef.current?.setIsolate(isolate); }, [isolate]);
-  useEffect(() => { viewerRef.current?.setXray(xray); }, [xray]);
-  useEffect(() => { viewerRef.current?.setClip(clip.axis, clip.amount); }, [clip]);
-  useEffect(() => { viewerRef.current?.setSpin(spin); }, [spin]);
-
+  // Load or reveal systems as the reader turns them on.
   useEffect(() => {
-    const viewer = viewerRef.current;
-    if (!viewer) return;
-    for (const rec of viewer.parts.values()) {
-      viewer.setSystemVisible(rec.part.system, !hidden.has(rec.part.system));
-    }
-  }, [hidden]);
+    const scene = sceneRef.current;
+    if (!scene) return;
+    let cancelled = false;
+
+    void (async () => {
+      for (const system of shown) {
+        if (cancelled) return;
+        if (!scene.isLoaded(system)) {
+          setLoading(system, true);
+          try {
+            await scene.loadSystem(system);
+          } finally {
+            setLoading(system, false);
+          }
+        }
+        scene.setSystemVisible(system, true);
+      }
+      // Hiding keeps the geometry in memory: turning a system back on should
+      // not cost the download again.
+      for (const system of [...scene.manifest.parts].map((p) => p.system)) {
+        if (!shown.has(system) && scene.isLoaded(system)) {
+          scene.setSystemVisible(system, false);
+        }
+      }
+    })();
+
+    return () => { cancelled = true; };
+  }, [shown, setLoading]);
+
+  useEffect(() => { sceneRef.current?.select(selected, { focus: false }); }, [selected]);
+  useEffect(() => { sceneRef.current?.setIsolate(isolate); }, [isolate]);
+  useEffect(() => { sceneRef.current?.setXray(xray); }, [xray]);
+  useEffect(() => { sceneRef.current?.setSpin(spin); }, [spin]);
 
   return (
     <canvas

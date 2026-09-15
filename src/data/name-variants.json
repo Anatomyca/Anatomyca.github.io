@@ -1,0 +1,105 @@
+{
+  "$comment": "Upstream BodyParts3D wordings that denote the same structure as one of the trilingual seed entries. Kept as data so the app and the validation scripts read one source. A match is recorded only where the two genuinely mean the same thing: BodyParts3D often names a single bone where the seed names the whole group.",
+  "variants": {
+    "heart": [
+      "heart"
+    ],
+    "liver": [
+      "liver"
+    ],
+    "spleen": [
+      "spleen"
+    ],
+    "stomach": [
+      "stomach"
+    ],
+    "pancreas": [
+      "pancreas"
+    ],
+    "bladder": [
+      "urinary bladder"
+    ],
+    "kidneys": [
+      "kidney",
+      "right kidney",
+      "left kidney"
+    ],
+    "lungs": [
+      "lung",
+      "right lung",
+      "left lung"
+    ],
+    "brain": [
+      "brain"
+    ],
+    "cerebellum": [
+      "cerebellum"
+    ],
+    "trachea": [
+      "trachea"
+    ],
+    "oesophagus": [
+      "esophagus",
+      "oesophagus"
+    ],
+    "diaphragm": [
+      "diaphragm",
+      "thoracic diaphragm"
+    ],
+    "thyroid": [
+      "thyroid gland"
+    ],
+    "gallbladder": [
+      "gallbladder",
+      "gall bladder"
+    ],
+    "spine": [
+      "vertebral column"
+    ],
+    "ribcage": [
+      "rib",
+      "rib cage"
+    ],
+    "sternum": [
+      "sternum"
+    ],
+    "skull": [
+      "skull",
+      "cranium"
+    ],
+    "mandible": [
+      "mandible"
+    ],
+    "pelvis": [
+      "pelvis",
+      "hip bone"
+    ],
+    "femur": [
+      "femur"
+    ],
+    "humerus": [
+      "humerus"
+    ],
+    "clavicle": [
+      "clavicle"
+    ],
+    "scapula": [
+      "scapula"
+    ],
+    "aorta": [
+      "aorta"
+    ],
+    "spinal-cord": [
+      "spinal cord"
+    ],
+    "small-intestine": [
+      "small intestine"
+    ],
+    "large-intestine": [
+      "large intestine"
+    ],
+    "skin": [
+      "skin"
+    ]
+  }
+}

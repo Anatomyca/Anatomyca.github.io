@@ -1,12 +1,12 @@
 /**
- * The seed atlas: forty-one structures across nine systems, drawn as
- * procedural geometry so the app renders with no mesh download at all.
+ * The trilingual name seed: forty-one structures with English, Sinhala,
+ * Tamil and Latin names.
  *
- * This is the Lite tier and the Tier 1 terminology seed. Every structure
- * here is Grade C — a recognisable teaching shape in a correct anatomical
- * position, not a dissection-grade surface. Structures imported from
- * BodyParts3D (Grade B) and Open3Dmodel (Grade A) merge into the same
- * index and supersede these where their IDs map across.
+ * These began as the procedural atlas that preceded the BodyParts3D import
+ * (see docs/adr/0003). The geometry is gone; the names are the part worth
+ * keeping, and they are matched onto BodyParts3D concepts by English name
+ * in src/atlas/names.ts. `build`, `grade` and `source` are vestigial and
+ * describe where the entry came from, not what is rendered.
  *
  * Sinhala and Tamil names carry status 'provisional': they follow standard
  * anatomical usage but have not yet passed the two-reviewer process. Only a
