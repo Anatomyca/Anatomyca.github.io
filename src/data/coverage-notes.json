@@ -36,6 +36,12 @@
       "si": "සම්පූර්ණ ශරීරයේ අස්ථි 296ක්. පුනරීක්ෂණය සඳහා, A ශ්‍රේණියේ 'අස්ථි පද්ධතිය' ආකෘතිය අස්ථි 144ම නම් කරයි.",
       "ta": "முழு உடலின் 296 எலும்பு வடிவங்கள். மறுபார்வைக்கு, A தர 'எலும்புத் தொகுதி' மாதிரி 144 எலும்புகளையும் பெயரிடுகிறது.",
       "fills": "Already covered by the shipped Open3Dmodel skeleton."
+    },
+    "respiratory": {
+      "en": "The airways in full: 100 bronchial trees down to segmental level, the trachea, larynx, and the nasal cavity and sinuses. There is no lung tissue — no lobes, pleura or parenchyma — so selecting a lung shows its bronchi and vessels, which is all this dataset contains.",
+      "si": "වාතනාල සම්පූර්ණයෙන්ම: ශ්වසනාල 100ක්, ශ්වාසනාලය, ස්වරාලය සහ නාසික කුහරය. පෙනහළු පටක නොමැත — එබැවින් පෙනහළුවක් තෝරන විට එහි ශ්වසනාල හා රුධිර නාල පමණක් පෙන්වයි.",
+      "ta": "சுவாசப் பாதைகள் முழுமையாக: 100 மூச்சுக்குழல் கிளைகள், மூச்சுக்குழாய், குரல்வளை, மூக்குக் குழி. நுரையீரல் திசு இல்லை — எனவே நுரையீரலைத் தெரிவு செய்தால் அதன் மூச்சுக்குழல்களும் இரத்தக் குழாய்களும் மட்டுமே தெரியும்.",
+      "fills": "AnatomyTOOL's CT-derived 'Normal lungs' and 'Anatomy of the airways' models, or a future Open3Dmodel thorax region. Neither is reachable from a sandboxed build; both need collecting by hand."
     }
   }
 }

@@ -31,13 +31,16 @@
       "label": "BodyParts3D Release 4.0",
       "licence": "CC-BY-4.0",
       "licenceUrl": "https://creativecommons.org/licenses/by/4.0/",
-      "attribution": "BodyParts3D, \u00a9 The Database Center for Life Science licensed under CC Attribution 4.0 International",
+      "attribution": "BodyParts3D, © The Database Center for Life Science licensed under CC Attribution 4.0 International",
       "grade": "B",
       "url": "https://dbarchive.biosciencedbc.jp/en/bodyparts3d/",
       "shipped": true,
       "notes": "Attribution wording is fixed by the licensor and must be reproduced verbatim. The README's licence section links the older CC BY-SA 2.1 Japan deed; the licence page is authoritative. Geometry derives from one adult male volunteer's MRI (the TARO voxel model), so proportions are not universal. Downloads are also covered by the NBDC terms of service.",
       "citation": "Mitsuhashi N., Fujieda K., Tamura T., Kawamoto S., Takagi T., Okubo K. (2009). BodyParts3D: 3D structure database for anatomical concepts. Nucleic Acids Research 37(suppl_1): D782-D785.",
-      "citationLicence": "CC-BY-NC-2.0-UK, which differs from the data licence: cite the paper, do not reuse its figures."
+      "citationLicence": "CC-BY-NC-2.0-UK, which differs from the data licence: cite the paper, do not reuse its figures.",
+      "creators": [
+        "The Database Center for Life Science (DBCLS), Japan"
+      ]
     },
     "open3dmodel": {
       "label": "Open3Dmodel",
@@ -47,7 +50,17 @@
       "grade": "A",
       "url": "https://anatomytool.org/open3dmodel-about",
       "shipped": true,
-      "notes": "Five anatomist-reviewed study models are shipped: the full named skeleton, the skull in three presentations (coloured, exploded, and the cranial base), and three representative vertebrae. 234 individually named structures, Grade A. Every structure was reviewed by one to three subject-expert anatomists against the standard reference works. SHIPPING THESE MAKES THE GEOMETRY PACK CC BY-SA 4.0 \u2014 see LICENSE-DATA.md. Its own web viewer is GPL-3.0 and must not be copied into this MIT codebase; its muscle textures are NonCommercial and are excluded. The GLB files declare no copyright string of their own, so attribution follows the project's published licence rather than file metadata."
+      "notes": "Five anatomist-reviewed study models are shipped: the full named skeleton, the skull in three presentations (coloured, exploded, and the cranial base), and three representative vertebrae. 234 individually named structures, Grade A. Every structure was reviewed by one to three subject-expert anatomists against the standard reference works. SHIPPING THESE MAKES THE GEOMETRY PACK CC BY-SA 4.0 — see LICENSE-DATA.md. Its own web viewer is GPL-3.0 and must not be copied into this MIT codebase; its muscle textures are NonCommercial and are excluded. The GLB files declare no copyright string of their own, so attribution follows the project's published licence rather than file metadata.",
+      "creators": [
+        "Leiden University Medical Center (LUMC)",
+        "UMC Utrecht",
+        "Maastricht University",
+        "KU Leuven",
+        "Amsterdam UMC",
+        "Radboud University Medical Center",
+        "Ghent University"
+      ],
+      "creditNote": "Produced by the anatomy departments of these institutions, with Dutch ministry funding. Individual reviewers are credited on the project’s own site; the distributed GLB files carry no author metadata, so they are not reproduced here."
     },
     "z-anatomy": {
       "label": "Z-Anatomy",
@@ -87,7 +100,10 @@
       "grade": "B",
       "url": "https://github.com/ashemag/human-atlas",
       "shipped": true,
-      "notes": "The BodyParts3D OBJ meshes were converted to metres/Y-up, simplified with meshoptimizer at a 0.2% per-structure relative error bound, normals quantised to signed 16-bit, and packed into binary chunks by this project. Anatomyca re-chunks that output by body system for per-system lazy loading; the vertex layout is unchanged. The batched-rendering approach is also adapted from it."
+      "notes": "The BodyParts3D OBJ meshes were converted to metres/Y-up, simplified with meshoptimizer at a 0.2% per-structure relative error bound, normals quantised to signed 16-bit, and packed into binary chunks by this project. Anatomyca re-chunks that output by body system for per-system lazy loading; the vertex layout is unchanged. The batched-rendering approach is also adapted from it.",
+      "creators": [
+        "ashemag"
+      ]
     }
   }
 }

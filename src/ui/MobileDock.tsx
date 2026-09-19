@@ -5,9 +5,10 @@ import { ModelPicker } from './ModelPicker';
 import { StructureList } from './StructureList';
 import { DetailSheet } from './DetailSheet';
 import { Controls } from './Controls';
+import { About } from './About';
 import { useAtlas } from '../state/store';
 
-type Panel = 'models' | 'systems' | 'detail' | 'tools' | null;
+type Panel = 'models' | 'systems' | 'detail' | 'tools' | 'about' | null;
 
 /**
  * The phone layout.
@@ -34,6 +35,7 @@ export function MobileDock() {
     { id: 'systems', label: t('dockSystems'), heading: studyModel ? t('parts') : t('systems'), icon: <LayersIcon /> },
     { id: 'detail', label: t('dockDetail'), heading: t('names'), icon: <InfoIcon /> },
     { id: 'tools', label: t('dockTools'), heading: t('dockTools'), icon: <SlidersIcon /> },
+    { id: 'about', label: t('dockAbout'), heading: t('about'), icon: <CreditsIcon /> },
   ];
 
   return (
@@ -61,6 +63,7 @@ export function MobileDock() {
           {panel === 'systems' && (studyModel ? <StructureList /> : <SystemRail />)}
           {panel === 'detail' && <DetailSheet />}
           {panel === 'tools' && <Controls variant="panel" />}
+          {panel === 'about' && <About />}
         </div>
       )}
 
@@ -97,6 +100,14 @@ const stroke = {
   fill: 'none', stroke: 'currentColor', strokeWidth: 1.8,
   strokeLinecap: 'round' as const, strokeLinejoin: 'round' as const,
 };
+
+function CreditsIcon() {
+  return (
+    <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" {...stroke}>
+      <path d="M4 5h16v14H4zM8 9h8M8 13h8M8 17h4" />
+    </svg>
+  );
+}
 
 function BodyIcon() {
   return (
