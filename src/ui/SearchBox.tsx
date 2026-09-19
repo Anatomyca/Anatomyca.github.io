@@ -30,7 +30,7 @@ export function SearchBox() {
   );
 
   function choose(id: string) {
-    select(id);
+    select(id, { focus: true });
     setQuery('');
     setOpen(false);
     inputRef.current?.blur();

@@ -1,6 +1,7 @@
 import { useTranslation } from 'react-i18next';
 import { BP3D_SYSTEMS } from '../atlas/systems';
 import { useAtlas } from '../state/store';
+import { coverageNote } from '../atlas/coverage';
 
 /**
  * Turn body systems on and off, to go from skin to skeleton.
@@ -29,25 +30,38 @@ export function SystemRail() {
         const busy = loading.has(system.id);
         const count = counts.get(system.id) ?? 0;
         if (count === 0) return null;
+        const note = on ? coverageNote(system.id, lang) : undefined;
         return (
-          <button
-            key={system.id}
-            onClick={() => setSystemShown(system.id, !on)}
-            aria-pressed={on}
-            aria-busy={busy}
-            className={`flex items-center gap-3 rounded px-3 py-2 text-left transition-colors
-                        ${on ? 'text-bone' : 'text-muted'} hover:bg-panel`}
-          >
-            <span
-              aria-hidden="true"
-              className="size-3 shrink-0 rounded-sm border border-edge"
-              style={{ background: on ? system.colour : 'transparent' }}
-            />
-            <span className="flex-1 leading-snug">{system.names[lang] ?? system.names.en}</span>
-            <span className="shrink-0 text-xs text-muted tabular-nums">
-              {busy ? '…' : count}
-            </span>
-          </button>
+          <div key={system.id}>
+            <button
+              onClick={() => setSystemShown(system.id, !on)}
+              aria-pressed={on}
+              aria-busy={busy}
+              className={`flex w-full items-center gap-3 rounded px-3 py-2 text-left
+                          transition-colors ${on ? 'text-bone' : 'text-muted'} hover:bg-panel`}
+            >
+              <span
+                aria-hidden="true"
+                className="size-3 shrink-0 rounded-sm border border-edge"
+                style={{ background: on ? system.colour : 'transparent' }}
+              />
+              <span className="min-w-0 flex-1 leading-snug">
+                {system.names[lang] ?? system.names.en}
+              </span>
+              <span className="shrink-0 text-xs text-muted tabular-nums">
+                {busy ? '…' : count}
+              </span>
+            </button>
+
+            {/* Shown once the system is on, which is when a reader would
+                otherwise wonder why so little appeared. */}
+            {note && (
+              <p className="mx-3 mb-2 rounded border border-edge bg-panel/60 px-2 py-1.5
+                            text-xs leading-snug text-muted">
+                {note.text}
+              </p>
+            )}
+          </div>
         );
       })}
     </nav>

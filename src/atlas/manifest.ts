@@ -34,6 +34,13 @@ export interface Bp3dConcept {
   readonly id: string;
   readonly name: string;
   readonly elements: readonly string[];
+  /**
+   * True for whole-organ concepts derived from left/right halves by this
+   * project — BodyParts3D names "right lung" and "left lung" but no "lung".
+   * The geometry is untouched; only the grouping is ours.
+   */
+  readonly derived?: boolean;
+  readonly sides?: readonly string[];
 }
 
 export interface Bp3dManifest {

@@ -13,6 +13,7 @@ interface AtlasState {
   shown: ReadonlySet<string>;
   loading: ReadonlySet<string>;
   isolate: boolean;
+  reveal: boolean;
   xray: number;
   spin: boolean;
   bookmarks: ReadonlySet<string>;
@@ -24,10 +25,14 @@ interface AtlasState {
 
   setManifest(manifest: Bp3dManifest): void;
   setLang(lang: Language): void;
-  select(id: string | null): void;
+  /** `focus` moves the camera. Set it for search and link opens, not taps. */
+  select(id: string | null, options?: { focus?: boolean }): void;
+  /** Bumped when a selection asks the camera to move. */
+  focusRequest: number;
   setSystemShown(system: string, shown: boolean): void;
   setLoading(system: string, loading: boolean): void;
   setIsolate(on: boolean): void;
+  setReveal(on: boolean): void;
   setXray(value: number): void;
   setSpin(on: boolean): void;
   toggleBookmark(id: string): void;
@@ -48,8 +53,10 @@ export const useAtlas = create<AtlasState>((set, get) => ({
   shown: new Set(LITE_SYSTEMS),
   loading: new Set<string>(),
   isolate: false,
+  reveal: true,
   xray: 0,
   spin: false,
+  focusRequest: 0,
   bookmarks: new Set<string>(),
   ready: false,
 
@@ -69,9 +76,34 @@ export const useAtlas = create<AtlasState>((set, get) => ({
     writeHash({ ...get(), lang });
   },
 
-  select(id) {
-    set({ selected: id });
-    writeHash({ ...get(), selected: id });
+  select(id, options) {
+    const { index, shown } = get();
+
+    // A selection the reader cannot see is worse than no selection: the
+    // detail panel would describe an organ that is not on screen. So the
+    // system holding the structure is switched on here, which makes the
+    // viewport fetch it if it has not been downloaded yet.
+    //
+    // Only that one system, deliberately. A concept reaches into every
+    // system its elements belong to — the heart takes in coronary arteries,
+    // cardiac veins and some muscle — and fetching all of them would put
+    // 18 MB and several seconds of geometry building between a reader and
+    // the organ they asked for. The system that holds the organ proper is
+    // what makes it visible; the rest stay one tap away in the rail.
+    let nextShown = shown;
+    if (id && index) {
+      const selection = resolve(index, id);
+      if (selection && !shown.has(selection.system)) {
+        nextShown = new Set([...shown, selection.system]);
+      }
+    }
+
+    set({
+      selected: id,
+      shown: nextShown,
+      ...(options?.focus ? { focusRequest: get().focusRequest + 1 } : {}),
+    });
+    writeHash({ ...get(), selected: id, shown: nextShown });
   },
 
   setSystemShown(system, shown) {
@@ -90,6 +122,7 @@ export const useAtlas = create<AtlasState>((set, get) => ({
   },
 
   setIsolate: (on) => set({ isolate: on }),
+  setReveal: (on) => set({ reveal: on }),
   setXray: (value) => set({ xray: Math.min(1, Math.max(0, value)) }),
   setSpin: (on) => set({ spin: on }),
 

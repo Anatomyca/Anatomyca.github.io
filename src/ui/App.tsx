@@ -6,13 +6,18 @@ import { SearchBox } from './SearchBox';
 import { SystemRail } from './SystemRail';
 import { LanguageSwitch } from './LanguageSwitch';
 import { Controls } from './Controls';
+import { MobileDock } from './MobileDock';
 import { useAtlas } from '../state/store';
 import { loadBookmarks, saveBookmarks } from '../lk/offline/storage';
 
 /**
- * Layout follows the viewport, per the mobile-first specification: under
- * 768px the body is full width with the detail sheet below it; from 768px a
- * side panel appears instead, so the model is never covered.
+ * Layout follows the viewport.
+ *
+ * Under 768px the body gets the whole screen and every panel is raised from
+ * the bottom bar; from 768px the three-pane layout appears. The header
+ * stacks on a phone rather than competing for one row, because Sinhala and
+ * Tamil labels run considerably longer than their English equivalents and a
+ * single row forces the search field down to a few characters wide.
  */
 export function App() {
   const { t } = useTranslation();
@@ -33,13 +38,22 @@ export function App() {
   useEffect(() => { void saveBookmarks([...bookmarks]); }, [bookmarks]);
 
   return (
-    <div className="flex h-full flex-col">
+    <div className="flex h-full flex-col overflow-x-hidden">
       <a href="#detail" className="sr-only focus:not-sr-only">Skip to details</a>
 
-      <header className="flex shrink-0 items-center gap-3 border-b border-edge px-3 py-2">
-        <h1 className="font-serif text-lg whitespace-nowrap">{t('appName')}</h1>
-        <div className="min-w-0 flex-1"><SearchBox /></div>
-        <LanguageSwitch />
+      <header
+        className="grid shrink-0 gap-2 border-b border-edge px-3 py-2 md:flex md:items-center md:gap-3"
+        style={{ paddingTop: 'max(0.5rem, env(safe-area-inset-top, 0px))' }}
+      >
+        {/* md:contents dissolves this wrapper on wide screens so its children
+            join the header row directly, ordered around the search field. */}
+        <div className="flex min-w-0 items-center justify-between gap-2 md:contents">
+          <h1 className="min-w-0 truncate font-serif text-lg md:order-1 md:shrink-0">
+            {t('appName')}
+          </h1>
+          <div className="shrink-0 md:order-3"><LanguageSwitch /></div>
+        </div>
+        <div className="min-w-0 md:order-2 md:flex-1"><SearchBox /></div>
       </header>
 
       <div className="relative flex min-h-0 flex-1 flex-col md:flex-row">
@@ -51,18 +65,21 @@ export function App() {
           <Viewport />
           {!ready && <BootOverlay />}
           {ready && loading.size > 0 && (
-            <p className="absolute top-3 left-1/2 -translate-x-1/2 rounded-full border
-                          border-edge bg-panel/90 px-3 py-1 text-xs text-muted backdrop-blur">
+            <p className="absolute inset-x-0 top-3 mx-auto w-fit max-w-[90%] truncate rounded-full
+                          border border-edge bg-panel/90 px-3 py-1 text-xs text-muted backdrop-blur">
               {t('buildingBody')}…
             </p>
           )}
-          <Controls />
+          {/* Floating controls would cover the body on a phone, so there they
+              live in the dock's tools sheet instead. */}
+          <div className="hidden md:block"><Controls /></div>
+          <div className="md:hidden"><MobileDock /></div>
         </main>
 
         <aside
           id="detail"
-          className="max-h-[45vh] shrink-0 overflow-y-auto border-t border-edge
-                     md:max-h-none md:w-80 md:border-l md:border-t-0 lg:w-96"
+          className="hidden shrink-0 overflow-y-auto border-edge md:block md:w-80
+                     md:border-l lg:w-96"
         >
           <DetailSheet />
         </aside>
@@ -74,9 +91,9 @@ export function App() {
 function BootOverlay() {
   const { t } = useTranslation();
   return (
-    <div className="absolute inset-0 grid place-content-center gap-3 bg-ground/90 text-center">
+    <div className="absolute inset-0 grid place-content-center gap-3 bg-ground/90 px-6 text-center">
       <p className="font-serif text-xl">{t('appName')}</p>
-      <div className="mx-auto h-1 w-48 overflow-hidden rounded bg-edge">
+      <div className="mx-auto h-1 w-40 max-w-full overflow-hidden rounded bg-edge">
         <div className="h-full w-1/3 animate-pulse bg-carmine" />
       </div>
       <p className="text-sm text-muted">{t('buildingBody')}</p>

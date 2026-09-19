@@ -1,0 +1,35 @@
+{
+  "$comment": "What each system does and does not contain in the shipped release. A medical student must not infer from an empty screen that a structure does not exist in the body. Notes are shown in the system list and on the detail panel. Keep them specific and factual; name the source that would close each gap.",
+  "notes": {
+    "nervous": {
+      "en": "Brain and spinal cord in full, plus the nerves of the orbit. BodyParts3D 4.0 does not model the peripheral nervous system, so the sciatic, vagus, facial and median nerves and the brachial plexus are absent.",
+      "si": "මොළය හා සුෂුම්නාව සම්පූර්ණයෙන්ම, අක්ෂි කුහරයේ ස්නායු සමඟ. BodyParts3D 4.0 හි පර්යන්ත ස්නායු පද්ධතිය ඇතුළත් නොවේ.",
+      "ta": "மூளையும் தண்டுவடமும் முழுமையாக, கண்குழி நரம்புகளுடன். BodyParts3D 4.0 இல் புற நரம்புத் தொகுதி இல்லை.",
+      "fills": "Open3Dmodel, which adds reviewed limb nerves (CC BY-SA 4.0), and the University of Dundee cranial nerve set (CC BY 4.0)."
+    },
+    "endocrine": {
+      "en": "Pituitary, pineal and both adrenal glands. The thyroid and parathyroid glands are not in this release.",
+      "si": "පිටියුටරි, පීනියල් සහ අධිවෘක්ක ග්‍රන්ථි දෙකම. තයිරොයිඩ් ග්‍රන්ථිය මෙම නිකුතුවේ නොමැත.",
+      "ta": "பிட்யூட்டரி, பீனியல் மற்றும் இரு அட்ரினல் சுரப்பிகள். தைராய்டு சுரப்பி இந்தப் பதிப்பில் இல்லை.",
+      "fills": "Open3Dmodel's head and neck region."
+    },
+    "lymphatic": {
+      "en": "Spleen and both lobes of the thymus. Lymph nodes and vessels are not modelled.",
+      "si": "ප්ලීහාව සහ තයිමස් ග්‍රන්ථියේ කොටස් දෙකම. වසා ගැටිති හා නාළ ඇතුළත් නොවේ.",
+      "ta": "மண்ணீரலும் தைமஸின் இரு மடல்களும். நிணநீர் முடிச்சுகளும் நாளங்களும் இல்லை.",
+      "fills": "No open dataset currently covers these at this level of detail."
+    },
+    "reproductive": {
+      "en": "Male reproductive anatomy only. This is an adult male reference body, so the ovaries, uterus and other female organs are absent.",
+      "si": "පිරිමි ප්‍රජනන ව්‍යුහය පමණි. මෙය වැඩිහිටි පිරිමි මූලාශ්‍ර ශරීරයකි.",
+      "ta": "ஆண் இனப்பெருக்க உறுப்புகள் மட்டும். இது ஒரு வயது வந்த ஆண் மூல உடல்.",
+      "fills": "The HuBMAP female reference organ set (CC BY 4.0), which the project plan already approves."
+    },
+    "integumentary": {
+      "en": "A skin shell for orientation, with eyebrow, scalp hair and lips. Skin layers are not separated.",
+      "si": "දිශානතිය සඳහා සමේ කවචයක්. සමේ ස්තර වෙන් කර නොමැත.",
+      "ta": "திசைகாட்ட ஒரு தோல் உறை. தோல் அடுக்குகள் பிரிக்கப்படவில்லை.",
+      "fills": "Not planned: the atlas teaches gross anatomy, not histology."
+    }
+  }
+}

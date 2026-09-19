@@ -20,7 +20,18 @@ const launchOptions = existsSync(PINNED_CHROMIUM)
  */
 export default defineConfig({
   testDir: 'tests/e2e',
-  fullyParallel: true,
+
+  /*
+   * Each test downloads and builds real geometry — the default view alone is
+   * about 9 MB, and switching on a system adds several more. Running many of
+   * those at once starves them all, so the suite is deliberately narrow and
+   * patient rather than wide and flaky. A failure here should mean the app
+   * is wrong, not that eight browsers were fighting over a socket.
+   */
+  fullyParallel: false,
+  workers: process.env['CI'] ? 1 : 2,
+  timeout: 90_000,
+  expect: { timeout: 15_000 },
   forbidOnly: !!process.env['CI'],
   retries: process.env['CI'] ? 2 : 0,
   reporter: process.env['CI'] ? 'github' : 'list',
