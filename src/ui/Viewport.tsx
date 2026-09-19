@@ -26,6 +26,7 @@ export function Viewport() {
   const setReady = useAtlas((s) => s.setReady);
   const setManifest = useAtlas((s) => s.setManifest);
   const setLoading = useAtlas((s) => s.setLoading);
+  const setLoadError = useAtlas((s) => s.setLoadError);
   const studyModel = useAtlas((s) => s.studyModel);
   const setStudyCatalogue = useAtlas((s) => s.setStudyCatalogue);
 
@@ -36,7 +37,16 @@ export function Viewport() {
     let scene: AnatomyScene | null = null;
 
     void (async () => {
-      scene = await createScene(canvas, { onSelect: (id) => select(id) });
+      try {
+        scene = await createScene(canvas, { onSelect: (id) => select(id) });
+      } catch (error) {
+        // Nothing renders without the manifest, so say why rather than
+        // leaving a boot screen up for ever.
+        if (!disposed) {
+          setLoadError(error instanceof Error ? error.message : String(error));
+        }
+        return;
+      }
       if (disposed) { scene.dispose(); return; }
       sceneRef.current = scene;
       setManifest(scene.manifest);

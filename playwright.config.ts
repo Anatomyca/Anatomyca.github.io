@@ -42,7 +42,10 @@ export default defineConfig({
   },
   webServer: {
     command: 'npm run preview -- --port 4173',
-    url: 'http://localhost:4173',
+    // Readiness means serving the manifest, not just answering on the port:
+    // the app cannot boot without it, and a run that starts too early sees a
+    // permanent boot screen that looks like an application bug.
+    url: 'http://localhost:4173/atlas/bodyparts3d.json',
     reuseExistingServer: !process.env['CI'],
     timeout: 120_000,
   },

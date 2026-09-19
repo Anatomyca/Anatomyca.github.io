@@ -22,6 +22,8 @@ interface AtlasState {
   spin: boolean;
   bookmarks: ReadonlySet<string>;
   ready: boolean;
+  /** Set when the atlas cannot load at all, so the boot screen can say so. */
+  loadError: string | null;
 
   index: AtlasIndex | null;
   partById(id: string): Bp3dPart | undefined;
@@ -44,6 +46,7 @@ interface AtlasState {
   toggleBookmark(id: string): void;
   setBookmarks(ids: readonly string[]): void;
   setReady(ready: boolean): void;
+  setLoadError(message: string | null): void;
   syncFromHash(hash: string): void;
 }
 
@@ -67,6 +70,7 @@ export const useAtlas = create<AtlasState>((set, get) => ({
   focusRequest: 0,
   bookmarks: new Set<string>(),
   ready: false,
+  loadError: null,
 
   partById(id) {
     return get().index?.parts.get(id);
@@ -151,6 +155,7 @@ export const useAtlas = create<AtlasState>((set, get) => ({
 
   setBookmarks: (ids) => set({ bookmarks: new Set(ids) }),
   setReady: (ready) => set({ ready }),
+  setLoadError: (loadError) => set({ loadError }),
 
   syncFromHash(hash) {
     const route = parseHash(hash);

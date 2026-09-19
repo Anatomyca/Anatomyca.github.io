@@ -83,3 +83,21 @@ test('returns to the whole body', async ({ page }) => {
   await expect(page.getByRole('button', { name: /Skeleton\s*296|අස්ථි පද්ධතිය/ }).first())
     .toBeVisible();
 });
+
+test('shows the credits the licences require, in the interface', async ({ page }) => {
+  // CC BY and CC BY-SA require attribution to be conveyed to the people the
+  // work reaches. A file in the repository does not reach them; this does.
+  await open(page);
+  const aboutButton = page.getByRole('button', { name: /^(About|පිළිබඳව|பற்றி|Credits|ස්තුති|நன்றி)$/ });
+  await aboutButton.first().click();
+
+  const panel = page.locator('#detail, [role=dialog]').last();
+  await expect(panel).toContainText(
+    'BodyParts3D, © The Database Center for Life Science licensed under CC Attribution 4.0 International',
+  );
+  await expect(panel).toContainText('Open3Dmodel');
+  await expect(panel).toContainText('Leiden');
+  await expect(panel).toContainText('CC-BY-SA-4.0');
+  // And the disclaimer, which a medical student needs to have seen.
+  await expect(panel).toContainText(/not a diagnostic/i);
+});

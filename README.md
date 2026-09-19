@@ -134,6 +134,16 @@ scripts/         the data pipeline and the CI gates
 docs/adr/        why things are the way they are
 ```
 
+## Credits
+
+Attribution is a licence condition, so the atlas shows it in the interface —
+**About** on a wide screen, **Credits** in the phone bar — not only in this
+repository. It names every shipped source with the wording its licensor
+requires, the institutions behind the reviewed geometry, the licence of the
+pack as a whole, and the papers behind the data.
+
+Adding more reviewed models: [`docs/adding-models.md`](docs/adding-models.md).
+
 ## Licences
 
 Code is MIT. Data is licensed separately — see

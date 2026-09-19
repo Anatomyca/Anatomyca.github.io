@@ -21,7 +21,8 @@
     "atlas:validate": "node scripts/validate-atlas.mjs && node scripts/validate-terms.mjs && node scripts/check-licences.mjs && node scripts/check-coverage.mjs",
     "atlas:all": "npm run atlas:models && npm run atlas:validate",
     "atlas:chunk": "node scripts/chunk-by-system.mjs && node scripts/derive-paired-concepts.mjs && node scripts/trim-manifest.mjs",
-    "atlas:models": "node scripts/build-study-models.mjs"
+    "atlas:models": "node scripts/build-study-models.mjs && node scripts/build-credits.mjs",
+    "atlas:credits": "node scripts/build-credits.mjs"
   },
   "dependencies": {
     "i18next": "^26.4.2",

@@ -39,7 +39,10 @@ export const BP3D_SYSTEMS: readonly System[] = [
   },
   {
     id: 'respiratory', colour: '#6fa8c7', inLite: true,
-    names: { en: 'Breathing', si: 'ශ්වසන පද්ධතිය', ta: 'சுவாசத் தொகுதி' },
+    // "Airways", not "Breathing" or "Lungs": this dataset holds the
+    // bronchial tree, trachea, larynx and upper airway, and no lung tissue
+    // at all. A label promising lungs would be a promise the data breaks.
+    names: { en: 'Airways', si: 'වාතනාල', ta: 'சுவாசப் பாதைகள்' },
   },
   {
     id: 'digestive', colour: '#c98a55', inLite: true,

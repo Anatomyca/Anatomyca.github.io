@@ -64,5 +64,14 @@
   "wholeBody": "Whole body",
   "wholeBodySummary": "Every system, 2,234 structures. A published reference dataset.",
   "dockModels": "Models",
-  "reviewed": "Reviewed by anatomists"
+  "reviewed": "Reviewed by anatomists",
+  "credits": "Credits",
+  "createdBy": "Created by",
+  "licence": "Licence",
+  "references": "References",
+  "packLicenceNote": "The anatomy data in this atlas is licensed under",
+  "codeLicenceNote": "The application code is MIT. Anything built from the data must carry the same licence.",
+  "dockAbout": "Credits",
+  "loadFailed": "The atlas could not be loaded. Check your connection and try again.",
+  "retry": "Try again"
 }
