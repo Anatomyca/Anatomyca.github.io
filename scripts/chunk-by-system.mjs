@@ -35,8 +35,12 @@ async function main() {
   const available = new Set(await readdir(sourceDir));
   const buffers = [];
   for (const [i, chunk] of manifest.chunks.entries()) {
-    const gzName = (chunk.gzip ?? chunk.url).replace(/^\/models\//, '');
-    const rawName = chunk.url.replace(/^\/models\//, '');
+    // Manifest paths have carried both /models/ and /chunks/ prefixes, and a
+    // re-run reads the chunks this script itself wrote. The basename is the
+    // only part that is stable across both, and it matches how the runtime
+    // loader resolves them.
+    const gzName = (chunk.gzip ?? chunk.url).split('/').pop();
+    const rawName = chunk.url.split('/').pop();
     let data;
     if (available.has(gzName)) data = gunzipSync(await readFile(join(sourceDir, gzName)));
     else if (available.has(rawName)) data = await readFile(join(sourceDir, rawName));

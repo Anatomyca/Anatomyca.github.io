@@ -52,3 +52,27 @@ describe('atlas search', () => {
     expect(labels('spleen')[0]).toBe('spleen');
   });
 });
+
+describe('search ranking', () => {
+  // Derived whole-organ concepts such as "side of heart" match the same
+  // words as "heart" and, on term frequency alone, can outrank it.
+  const withDerived = buildSearch(PARTS, 'en', [
+    ...CONCEPTS,
+    { id: 'PAIR-side-of-heart', name: 'side of heart', elements: ['a', 'b'], derived: true },
+    { id: 'PAIR-lung', name: 'lung', elements: ['c', 'd'], derived: true },
+  ] as unknown as Bp3dConcept[]);
+  const top = (q: string) => withDerived.search(q)[0]?.['label'] as string;
+
+  it('puts the exact name first', () => {
+    expect(top('heart')).toBe('heart');
+  });
+
+  it('still finds a derived whole-organ concept by its own name', () => {
+    // "lung" exists only as left and right halves upstream.
+    expect(top('lung')).toBe('lung');
+  });
+
+  it('finds a longer name when that is what was typed', () => {
+    expect(top('side of heart')).toBe('side of heart');
+  });
+});

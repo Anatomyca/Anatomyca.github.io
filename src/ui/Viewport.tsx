@@ -1,5 +1,6 @@
 import { useEffect, useRef } from 'react';
 import { createScene, type AnatomyScene } from '../atlas/scene';
+import { resolve } from '../atlas/selection';
 import { useAtlas } from '../state/store';
 
 /**
@@ -16,8 +17,10 @@ export function Viewport() {
   const selected = useAtlas((s) => s.selected);
   const shown = useAtlas((s) => s.shown);
   const isolate = useAtlas((s) => s.isolate);
+  const reveal = useAtlas((s) => s.reveal);
   const xray = useAtlas((s) => s.xray);
   const spin = useAtlas((s) => s.spin);
+  const focusRequest = useAtlas((s) => s.focusRequest);
   const select = useAtlas((s) => s.select);
   const setReady = useAtlas((s) => s.setReady);
   const setManifest = useAtlas((s) => s.setManifest);
@@ -91,7 +94,33 @@ export function Viewport() {
   }, [shown, setLoading]);
 
   useEffect(() => { sceneRef.current?.select(selected, { focus: false }); }, [selected]);
+
+  // Framing waits for the geometry: focusing an organ whose system is still
+  // downloading would move the camera to an empty stretch of space.
+  useEffect(() => {
+    if (!focusRequest || !selected) return;
+    const scene = sceneRef.current;
+    if (!scene) return;
+    let cancelled = false;
+    const tryFocus = () => {
+      if (cancelled) return true;
+      // A concept id is not a mesh id, so resolve it first. Waiting on the
+      // structure's own system is enough: that is the one being loaded, and
+      // framing everything it touches would mean waiting on systems the
+      // reader never asked for.
+      const target = resolve(scene.index, selected);
+      if (!target) return true;
+      if (!scene.isLoaded(target.system)) return false;
+      scene.focus(selected);
+      return true;
+    };
+    if (tryFocus()) return;
+    const timer = setInterval(() => { if (tryFocus()) clearInterval(timer); }, 250);
+    const stop = setTimeout(() => clearInterval(timer), 20_000);
+    return () => { cancelled = true; clearInterval(timer); clearTimeout(stop); };
+  }, [focusRequest, selected]);
   useEffect(() => { sceneRef.current?.setIsolate(isolate); }, [isolate]);
+  useEffect(() => { sceneRef.current?.setReveal(reveal); }, [reveal]);
   useEffect(() => { sceneRef.current?.setXray(xray); }, [xray]);
   useEffect(() => { sceneRef.current?.setSpin(spin); }, [spin]);
 

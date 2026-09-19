@@ -36,6 +36,8 @@ export interface AnatomyScene {
   focus(id: string): void;
   getSelection(): Selection | null;
   setIsolate(on: boolean): void;
+  /** Fade everything that is not selected, so the selection reads through. */
+  setReveal(on: boolean): void;
   setXray(value: number): void;
   setSpin(on: boolean): void;
   setView(name: 'front' | 'back' | 'left' | 'right' | 'top'): void;
@@ -68,6 +70,9 @@ export async function createScene(
   renderer.setPixelRatio(Math.min(devicePixelRatio, coarse ? 1.5 : 2));
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
   renderer.toneMappingExposure = 1.05;
+  // The frame is drawn in two passes, so clearing is done by hand: letting
+  // render() auto-clear would wipe the first pass when the second one runs.
+  renderer.autoClear = false;
 
   const scene = new THREE.Scene();
   const camera = new THREE.PerspectiveCamera(38, 1, 0.05, 40);
@@ -96,6 +101,21 @@ export async function createScene(
   const root = new THREE.Group();
   scene.add(root);
 
+  /**
+   * Selected structures are drawn in a second pass, after the depth buffer is
+   * cleared. That is what lets the brain read through the skull while still
+   * shading correctly against itself — one material per batch cannot
+   * depth-sort a selection against its own surroundings.
+   */
+  const overlay = new THREE.Scene();
+  overlay.environment = environment.texture;
+  overlay.environmentIntensity = 0.5;
+  const overlayKey = new THREE.DirectionalLight(0xfff3e4, 1.6);
+  overlayKey.position.copy(key.position);
+  overlay.add(overlayKey);
+  const overlayRoot = new THREE.Group();
+  overlay.add(overlayRoot);
+
   const manifest = await loadManifest();
   const index = buildIndex(manifest);
   const partsById = index.parts;
@@ -106,6 +126,7 @@ export async function createScene(
   let selectedElements = new Set<string>();
   let hovered: string | null = null;
   let isolate = false;
+  let reveal = true;
   let xray = 0;
   let running = true;
   let dirty = true;
@@ -115,12 +136,44 @@ export async function createScene(
 
   function invalidate(): void { dirty = true; }
 
+  /**
+   * Distance at which the whole body fits the viewport.
+   *
+   * A fixed distance is tuned for one shape of window: on a phone held
+   * upright it leaves the body small and marooned in dead space, and on a
+   * squat landscape window it crops the head and feet. Deriving it from the
+   * aspect ratio makes the body fill the frame on both.
+   */
+  const BODY_HEIGHT = 1.9;   // a little headroom over the 1.75 m model
+  const BODY_WIDTH = 0.72;   // arms at rest
+  const FILL = 0.92;
+
+  function fitDistance(aspect: number): number {
+    const vFov = (camera.fov * Math.PI) / 180;
+    const byHeight = BODY_HEIGHT / 2 / Math.tan(vFov / 2);
+    // Horizontal field follows from the vertical one and the aspect ratio.
+    const hFov = 2 * Math.atan(Math.tan(vFov / 2) * aspect);
+    const byWidth = BODY_WIDTH / 2 / Math.tan(hFov / 2);
+    return Math.max(byHeight, byWidth) / FILL;
+  }
+
+  let framed = false;
+
   function resize(): void {
     const w = canvas.clientWidth || 1;
     const h = canvas.clientHeight || 1;
     renderer.setSize(w, h, false);
     camera.aspect = w / h;
     camera.updateProjectionMatrix();
+
+    // Frame the body once, on the first real layout. Later resizes must not
+    // yank the camera back from wherever the reader has moved it.
+    if (!framed && w > 1 && h > 1) {
+      framed = true;
+      camera.position.set(0, BODY_CENTRE.y, fitDistance(camera.aspect));
+      controls.target.copy(BODY_CENTRE);
+      controls.update();
+    }
     invalidate();
   }
   new ResizeObserver(resize).observe(canvas);
@@ -131,15 +184,20 @@ export async function createScene(
     for (const batch of batches.values()) {
       const systemHidden = hiddenSystems.has(batch.system);
       batch.mesh.visible = !systemHidden;
+      batch.highlight.visible = !systemHidden && reveal && selection !== null;
       const base = baseOpacityOf(batch.system);
       for (const part of batch.parts) {
         const isSelected = selectedElements.has(part.id);
         const hide = isolate && selection !== null && !isSelected;
-        // A selected structure is always solid; everything else sits at its
-        // system's resting opacity, reduced further by the see-through dial.
+        // A selected structure is always solid. Everything else sits at its
+        // system's resting opacity, reduced by the see-through dial and — when
+        // something is selected and reveal is on — faded further so the
+        // selection is visible through whatever encloses it. Without this,
+        // selecting the brain shows an opaque skull.
+        const dimmed = reveal && selection !== null ? 0.22 : 1;
         const opacity = isSelected
           ? 1
-          : Math.max(0.04, base * (1 - xray * 0.94));
+          : Math.max(0.03, base * dimmed * (1 - xray * 0.94));
         setPartState(batch, part.id, {
           visible: !hide,
           emphasis: isSelected ? 1 : part.id === hovered ? 0.35 : 0,
@@ -147,7 +205,7 @@ export async function createScene(
         });
       }
       // Fully opaque batches can skip blending entirely.
-      const needsBlend = xray > 0 || base < 1;
+      const needsBlend = xray > 0 || base < 1 || (reveal && selection !== null);
       if (batch.material.transparent !== needsBlend) {
         batch.material.transparent = needsBlend;
         batch.material.depthWrite = !needsBlend;
@@ -163,6 +221,7 @@ export async function createScene(
     if (!batch) return;
     batches.set(system, batch);
     root.add(batch.mesh);
+    overlayRoot.add(batch.highlight);
     refresh();
     events.onSystemLoaded?.(system, batches.size, LITE_SYSTEMS.length);
   }
@@ -171,6 +230,7 @@ export async function createScene(
     const batch = batches.get(system);
     if (!batch) return;
     root.remove(batch.mesh);
+    overlayRoot.remove(batch.highlight);
     disposeBatch(batch);
     batches.delete(system);
     invalidate();
@@ -304,7 +364,10 @@ export async function createScene(
       const box = new THREE.Box3();
       for (const element of target.elements) {
         const part = partsById.get(element);
-        if (!part) continue;
+        // Frame only what is loaded and showing: including a coronary artery
+        // whose system is still switched off would pull the camera back from
+        // the organ the reader asked to see.
+        if (!part || !batches.has(part.system) || hiddenSystems.has(part.system)) continue;
         const [min, max] = part.bounds;
         box.expandByPoint(new THREE.Vector3(min[0], min[1], min[2]));
         box.expandByPoint(new THREE.Vector3(max[0], max[1], max[2]));
@@ -317,6 +380,7 @@ export async function createScene(
     },
 
     setIsolate(on) { isolate = on; refresh(); },
+    setReveal(on) { reveal = on; refresh(); },
     setXray(value) { xray = THREE.MathUtils.clamp(value, 0, 1); refresh(); },
     setSpin(on) { controls.autoRotate = on; invalidate(); },
 
@@ -331,7 +395,9 @@ export async function createScene(
       moveTo(new THREE.Vector3().setFromSpherical(spherical).add(target), target);
     },
 
-    resetView() { moveTo(new THREE.Vector3(0, 1.05, 3.1), BODY_CENTRE.clone()); },
+    resetView() {
+      moveTo(new THREE.Vector3(0, BODY_CENTRE.y, fitDistance(camera.aspect)), BODY_CENTRE.clone());
+    },
     partById: (id) => partsById.get(id),
     invalidate,
 
@@ -367,7 +433,15 @@ export async function createScene(
     if (!dirty) return;
     dirty = false;
 
+    renderer.clear();
     renderer.render(scene, camera);
+
+    // Second pass: clear depth only — never colour — so the selection draws
+    // over what encloses it while keeping the body behind it.
+    if (reveal && selection !== null) {
+      renderer.clearDepth();
+      renderer.render(overlay, camera);
+    }
 
     const dt = now - lastFrame;
     lastFrame = now;

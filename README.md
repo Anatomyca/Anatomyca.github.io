@@ -25,6 +25,31 @@ Static site, no backend, no accounts, no tracking. All personal state
 - **Shareable deep links**: `#/s/FMA7088?lang=si` opens on the heart, in
   Sinhala.
 - **Installable and offline** after the first visit.
+- **Built for a phone.** Every panel is reachable from a bottom bar, the
+  body keeps the screen until something is asked for, and the layout holds
+  at 320px in all three languages.
+
+## What the dataset does and does not contain
+
+BodyParts3D 4.0 is an adult male reference body. It is thorough in most
+places and empty in a few, and the interface says which is which rather than
+leaving a reader to guess:
+
+| System | In this release | Missing |
+|---|---|---|
+| Nervous | 96 brain structures, spinal cord, 40 orbital nerves | **All peripheral nerves** — sciatic, vagus, facial, median, brachial plexus |
+| Endocrine | Pituitary, pineal, both adrenals | Thyroid, parathyroid |
+| Lymphatic | Spleen, both thymus lobes | Lymph nodes and vessels |
+| Reproductive | Male only | Ovaries, uterus, and the rest of female anatomy |
+
+Every system carrying a gap shows a note naming it, and naming the open
+dataset that would close it — Open3Dmodel for the limb nerves and the head
+and neck, HuBMAP for the female body.
+
+Where BodyParts3D names only halves — "right lung", "left lung", but no
+"lung" — the whole organ is derived from the pair and carries a `PAIR-` id.
+Ninety-nine organs are reachable this way that otherwise were not, including
+the lungs, eyes, hands and feet.
 
 ## Accuracy, honestly
 

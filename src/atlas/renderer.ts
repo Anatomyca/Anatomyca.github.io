@@ -23,7 +23,16 @@ const CHANNELS = 4;
 export interface SystemBatch {
   readonly system: string;
   readonly mesh: THREE.Mesh;
+  /**
+   * A second pass over the same geometry that draws only the selected parts,
+   * with depth testing off, so the selection is visible through whatever
+   * encloses it. Without it, selecting the brain shows an opaque skull:
+   * one material per batch cannot depth-sort a selection against its own
+   * surroundings, however faint those surroundings are made.
+   */
+  readonly highlight: THREE.Mesh;
   readonly material: THREE.MeshStandardMaterial;
+  readonly highlightMaterial: THREE.MeshStandardMaterial;
   readonly parts: readonly Bp3dPart[];
   /** part id -> row in the state texture */
   readonly index: ReadonlyMap<string, number>;
@@ -144,10 +153,30 @@ export async function buildSystemBatch(
   mesh.name = system;
   mesh.frustumCulled = false;
 
+  // The highlight pass shares the geometry — no extra memory — and keeps only
+  // the fragments whose emphasis channel is set.
+  const highlightMaterial = new THREE.MeshStandardMaterial({
+    color: new THREE.Color(definition?.colour ?? '#d8cfc0'),
+    emissive: new THREE.Color('#c8504a'),
+    emissiveIntensity: 0.28,
+    roughness: 0.5,
+    metalness: 0,
+    side: THREE.DoubleSide,
+  });
+  attachHighlightState(highlightMaterial, texture, width);
+
+  const highlight = new THREE.Mesh(geometry, highlightMaterial);
+  highlight.name = `${system}:highlight`;
+  highlight.frustumCulled = false;
+  highlight.visible = false;     // only shown while something is selected
+  highlight.raycast = () => {};  // never pickable: the base mesh handles that
+
   return {
     system,
     mesh,
+    highlight,
     material,
+    highlightMaterial,
     parts,
     index: new Map(parts.map((p, i) => [p.id, i])),
     state,
@@ -196,8 +225,39 @@ export function partAtIntersection(
   return batch.parts[i] ?? null;
 }
 
+/** Keep only the fragments of parts that are currently emphasised. */
+function attachHighlightState(
+  material: THREE.MeshStandardMaterial,
+  texture: THREE.DataTexture,
+  width: number,
+): void {
+  material.onBeforeCompile = (shader) => {
+    shader.uniforms['partState'] = { value: texture };
+    shader.uniforms['partStateWidth'] = { value: width };
+
+    shader.vertexShader = shader.vertexShader
+      .replace('#include <common>', `#include <common>
+        attribute float partIndex;
+        varying float vPartIndex;`)
+      .replace('#include <begin_vertex>', `#include <begin_vertex>
+        vPartIndex = partIndex;`);
+
+    shader.fragmentShader = shader.fragmentShader
+      .replace('#include <common>', `#include <common>
+        uniform sampler2D partState;
+        uniform float partStateWidth;
+        varying float vPartIndex;`)
+      .replace('#include <dithering_fragment>', `#include <dithering_fragment>
+        vec2 stateUv = vec2((vPartIndex + 0.5) / partStateWidth, 0.5);
+        vec4 state = texture2D(partState, stateUv);
+        if (state.g < 0.5 || state.r < 0.5) discard;`);
+  };
+  material.needsUpdate = true;
+}
+
 export function disposeBatch(batch: SystemBatch): void {
   batch.mesh.geometry.dispose();
   batch.material.dispose();
+  batch.highlightMaterial.dispose();
   batch.texture.dispose();
 }

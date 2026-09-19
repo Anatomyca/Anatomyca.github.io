@@ -24,9 +24,12 @@ export interface Selection {
   readonly system: string;
 }
 
-/** Concept ids are FMA-prefixed; element ids are not. */
+/**
+ * Concept ids are FMA-prefixed, or PAIR- for the whole-organ concepts this
+ * project derives from left/right halves. Element mesh ids are neither.
+ */
 export function isConceptId(id: string): boolean {
-  return id.startsWith('FMA');
+  return id.startsWith('FMA') || id.startsWith('PAIR-');
 }
 
 export interface AtlasIndex {
@@ -57,21 +60,45 @@ export function buildIndex(manifest: Bp3dManifest): AtlasIndex {
   return { parts, concepts, conceptsOfElement };
 }
 
+/**
+ * Which system a concept belongs to.
+ *
+ * Two rules, in order, because neither works alone:
+ *
+ *  1. The elements that carry the concept's own name. The liver's segments
+ *     are named after hepatic veins and classified venous upstream, so
+ *     weighing the whole concept by bulk files the liver under "Veins" —
+ *     but the meshes actually called "liver" are digestive, and they are
+ *     what a reader means.
+ *  2. Failing that, the system holding most of it by triangle count. The
+ *     heart has no mesh called "heart" at all, and is built from more
+ *     coronary vessel meshes than chamber meshes, but the chambers are its
+ *     bulk and it is plainly cardiac.
+ */
+function systemForConcept(index: AtlasIndex, concept: Bp3dConcept): string {
+  const needle = concept.name.toLowerCase();
+  const named = new Map<string, number>();
+  const bulk = new Map<string, number>();
+
+  for (const element of concept.elements) {
+    const part = index.parts.get(element);
+    if (!part) continue;
+    bulk.set(part.system, (bulk.get(part.system) ?? 0) + part.indexCount);
+    if (part.name.toLowerCase().includes(needle)) {
+      named.set(part.system, (named.get(part.system) ?? 0) + part.indexCount);
+    }
+  }
+
+  const best = (tally: Map<string, number>) =>
+    [...tally.entries()].sort((a, b) => b[1] - a[1])[0]?.[0];
+  return best(named) ?? best(bulk) ?? 'skeletal';
+}
+
 export function resolve(index: AtlasIndex, id: string): Selection | null {
   if (isConceptId(id)) {
     const concept = index.concepts.get(id);
     if (!concept) return null;
-    // A concept spans whichever systems its elements belong to. Weigh them by
-    // triangle count rather than by how many meshes each contributes: the
-    // heart is built from more coronary vessel meshes than chamber meshes,
-    // but it is plainly cardiac, and the chambers are the bulk of it.
-    const tally = new Map<string, number>();
-    for (const element of concept.elements) {
-      const part = index.parts.get(element);
-      if (!part) continue;
-      tally.set(part.system, (tally.get(part.system) ?? 0) + part.indexCount);
-    }
-    const system = [...tally.entries()].sort((a, b) => b[1] - a[1])[0]?.[0] ?? 'skeletal';
+    const system = systemForConcept(index, concept);
     return {
       kind: 'concept',
       id,

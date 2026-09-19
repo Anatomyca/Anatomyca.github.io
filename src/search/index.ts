@@ -20,6 +20,10 @@ interface IndexedPart {
   kind: 'concept' | 'element';
   /** How many meshes this entry covers; concepts gather many. */
   size: number;
+  /** Grouping this project derived rather than took from the licensor. */
+  derived: boolean;
+  /** Normalised name, kept for exact-match ranking. */
+  exact: string;
   name_en: string;
   name_si: string;
   name_ta: string;
@@ -53,6 +57,8 @@ function toDocument(part: Bp3dPart, lang: Language): IndexedPart {
     label: (lang !== 'en' && local?.[lang]) || part.name,
     kind: 'element',
     size: 1,
+    derived: false,
+    exact: normalise(part.name),
     name_en: normalise(part.name),
     name_si: normalise(local?.si ?? ''),
     name_ta: normalise(local?.ta ?? ''),
@@ -79,6 +85,8 @@ function conceptDocument(concept: Bp3dConcept, lang: Language): IndexedPart {
     label: (lang !== 'en' && local?.[lang]) || concept.name,
     kind: 'concept',
     size: concept.elements.length,
+    derived: Boolean(concept.derived),
+    exact: normalise(concept.name),
     name_en: normalise(concept.name),
     name_si: normalise(local?.si ?? ''),
     name_ta: normalise(local?.ta ?? ''),
@@ -96,7 +104,7 @@ export function buildSearch(
 ): AtlasSearch {
   const mini = new MiniSearch<IndexedPart>({
     fields: [...FIELDS],
-    storeFields: ['id', 'label', 'system', 'kind', 'size'],
+    storeFields: ['id', 'label', 'system', 'kind', 'size', 'derived', 'exact'],
     searchOptions: { boost: BOOSTS, prefix: true, fuzzy: 0.2 },
     // Names are pre-normalised at index time; queries take the same path
     // below, so the two sides always agree.
@@ -108,8 +116,8 @@ export function buildSearch(
   ]);
 
   return {
-    search(query, limit = 12) {
-      const forms = matchForms(query);
+    search(q, limit = 12) {
+      const forms = matchForms(q);
       if (forms.length === 0) return [];
       const seen = new Set<string>();
       const out: SearchResult[] = [];
@@ -121,15 +129,22 @@ export function buildSearch(
           out.push(hit);
         }
       }
-      return out
-        .sort((a, b) => {
-          // Prefer the named organ over one of the meshes inside it when the
-          // scores are close: "heart" should offer the heart, not a ventricle
-          // wall fragment that happens to match as well.
-          const bias = (r: SearchResult) => (r['kind'] === 'concept' ? 1.15 : 1);
-          return b.score * bias(b) - a.score * bias(a);
-        })
-        .slice(0, limit);
+      // Term frequency alone puts "side of heart" above "heart", because
+      // both match and the shorter field scores well. What a reader typing
+      // "heart" wants is the thing actually called that, so an exact name
+      // match outranks everything, then a name that starts with the query.
+      const query = normalise(q);
+      const bias = (r: SearchResult): number => {
+        const name = (r['exact'] as string | undefined) ?? '';
+        let weight = r['kind'] === 'concept' ? 1.15 : 1;
+        if (name === query) weight *= 6;
+        else if (name.startsWith(`${query} `)) weight *= 1.5;
+        // A grouping this project derived is a convenience, not a name the
+        // licensor gave, so it yields to a real one of equal strength.
+        if (r['derived']) weight *= 0.92;
+        return weight;
+      };
+      return out.sort((a, b) => b.score * bias(b) - a.score * bias(a)).slice(0, limit);
     },
   };
 }
