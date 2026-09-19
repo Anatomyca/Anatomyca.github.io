@@ -1,0 +1,611 @@
+{
+ "source": "open3dmodel",
+ "grade": "A",
+ "generatedAt": "2026-09-19T17:16:54.230Z",
+ "models": [
+  {
+   "id": "skeleton",
+   "file": "overview-skeleton.glb",
+   "names": {
+    "en": "Skeleton",
+    "si": "අස්ථි පද්ධතිය",
+    "ta": "எலும்புத் தொகுதி"
+   },
+   "summary": {
+    "en": "Every named bone of the body, reviewed by anatomists.",
+    "si": "ශරීරයේ නම් කළ සෑම අස්ථියක්ම, ව්‍යුහ විද්‍යාඥයන් විසින් සමාලෝචනය කරන ලදී.",
+    "ta": "உடலின் பெயரிடப்பட்ட ஒவ்வொரு எலும்பும், உடற்கூற்றியலாளரால் மதிப்பாய்வு செய்யப்பட்டது."
+   },
+   "bytes": 3422276,
+   "structures": [
+    {
+     "id": "1st metacarpal bone.r",
+     "name": "1st metacarpal bone (right)",
+     "triangles": 1502,
+     "bounds": [
+      [
+       -0.3207,
+       0.8104,
+       0.0189
+      ],
+      [
+       -0.2826,
+       0.8482,
+       0.0496
+      ]
+     ]
+    },
+    {
+     "id": "2nd metacarpal bone.r",
+     "name": "2nd metacarpal bone (right)",
+     "triangles": 2064,
+     "bounds": [
+      [
+       -0.3031,
+       0.7675,
+       0.0123
+      ],
+      [
+       -0.2716,
+       0.8373,
+       0.0383
+      ]
+     ]
+    },
+    {
+     "id": "3rd metacarpal bone.r",
+     "name": "3rd metacarpal bone (right)",
+     "triangles": 2124,
+     "bounds": [
+      [
+       -0.2824,
+       0.7693,
+       0.0075
+      ],
+      [
+       -0.2623,
+       0.8354,
+       0.0385
+      ]
+     ]
+    },
+    {
+     "id": "4th metacarpal bone.r",
+     "name": "4th metacarpal bone (right)",
+     "triangles": 1900,
+     "bounds": [
+      [
+       -0.2631,
+       0.7741,
+       0.0108
+      ],
+      [
+       -0.2507,
+       0.8357,
+       0.0376
+      ]
+     ]
+    },
+    {
+     "id": "5th metacarpal bone.r",
+     "name": "5th metacarpal bone (right)",
+     "triangles": 1814,
+     "bounds": [
+      [
+       -0.2547,
+       0.781,
+       0.0153
+      ],
+      [
+       -0.2342,
+       0.8376,
+       0.0401
+      ]
+     ]
+    },
+    {
+     "id": "Atlas (C1)",
+     "name": "Atlas (C1)",
+     "triangles": 7024,
+     "bounds": [
+      [
+       -0.0421,
+       1.5331,
+       -0.0444
+      ],
+      [
+       0.0421,
+       1.5525,
+       0.0021
+      ]
+     ]
+    }
+   ],
+   "bounds": [
+    [
+     -0.3355,
+     0.0091,
+     -0.1171
+    ],
+    [
+     0.0742,
+     1.7051,
+     0.1371
+    ]
+   ]
+  },
+  {
+   "id": "skull",
+   "file": "overview-colored-skull.glb",
+   "names": {
+    "en": "Skull",
+    "si": "හිස්කබල",
+    "ta": "மண்டையோடு"
+   },
+   "summary": {
+    "en": "The skull with each bone and tooth separately named and coloured.",
+    "si": "සෑම අස්ථියක්ම හා දතක්ම වෙන් වෙන්ව නම් කර වර්ණ ගන්වා ඇති හිස්කබල.",
+    "ta": "ஒவ்வொரு எலும்பும் பல்லும் தனித்தனியே பெயரிடப்பட்ட மண்டையோடு."
+   },
+   "bytes": 1136032,
+   "structures": [
+    {
+     "id": "Ethmoid Bone",
+     "name": "Ethmoid Bone",
+     "triangles": 25344,
+     "bounds": [
+      [
+       -0.0172,
+       1.5743,
+       0.0352
+      ],
+      [
+       0.0172,
+       1.6108,
+       0.0826
+      ]
+     ]
+    },
+    {
+     "id": "Frontal bone",
+     "name": "Frontal bone",
+     "triangles": 7630,
+     "bounds": [
+      [
+       -0.0601,
+       1.5988,
+       0.0206
+      ],
+      [
+       0.0602,
+       1.6986,
+       0.087
+      ]
+     ]
+    },
+    {
+     "id": "Inferior nasal concha bone.r",
+     "name": "Inferior nasal concha bone (right)",
+     "triangles": 2284,
+     "bounds": [
+      [
+       -0.0166,
+       1.5641,
+       0.0411
+      ],
+      [
+       -0.0055,
+       1.5805,
+       0.0785
+      ]
+     ]
+    },
+    {
+     "id": "Lacrimal bone.r",
+     "name": "Lacrimal bone (right)",
+     "triangles": 1928,
+     "bounds": [
+      [
+       -0.0181,
+       1.5761,
+       0.064
+      ],
+      [
+       -0.0064,
+       1.6026,
+       0.0755
+      ]
+     ]
+    },
+    {
+     "id": "Lower canine.r",
+     "name": "Lower canine (right)",
+     "triangles": 934,
+     "bounds": [
+      [
+       -0.0166,
+       1.5089,
+       0.0687
+      ],
+      [
+       -0.009,
+       1.5349,
+       0.0838
+      ]
+     ]
+    },
+    {
+     "id": "Lower first molar tooth.r",
+     "name": "Lower first molar tooth (right)",
+     "triangles": 1064,
+     "bounds": [
+      [
+       -0.0286,
+       1.5207,
+       0.05
+      ],
+      [
+       -0.0167,
+       1.5397,
+       0.0645
+      ]
+     ]
+    }
+   ],
+   "bounds": [
+    [
+     -0.0743,
+     1.5038,
+     -0.1034
+    ],
+    [
+     0.0742,
+     1.7051,
+     0.1004
+    ]
+   ]
+  },
+  {
+   "id": "skull-exploded",
+   "file": "exploded-skull.glb",
+   "names": {
+    "en": "Skull, exploded",
+    "si": "හිස්කබල, වෙන් කළ",
+    "ta": "மண்டையோடு, பிரித்த"
+   },
+   "summary": {
+    "en": "The same bones drawn apart, so the sutures between them can be followed.",
+    "si": "එකිනෙකින් වෙන් කර ඇඳි එම අස්ථි, ඒවා අතර මැහුම් අනුගමනය කළ හැකි වන පරිදි.",
+    "ta": "அதே எலும்புகள் விலக்கி வரையப்பட்டுள்ளன, அவற்றுக்கிடையேயான இணைப்புகளைப் பின்தொடர."
+   },
+   "bytes": 1204020,
+   "structures": [
+    {
+     "id": "Ethmoid Bone",
+     "name": "Ethmoid Bone",
+     "triangles": 12672,
+     "bounds": [
+      [
+       -0.0172,
+       1.5743,
+       0.0352
+      ],
+      [
+       0.0172,
+       1.6108,
+       0.0826
+      ]
+     ]
+    },
+    {
+     "id": "Frontal bone",
+     "name": "Frontal bone",
+     "triangles": 7630,
+     "bounds": [
+      [
+       -0.0601,
+       1.6388,
+       0.0606
+      ],
+      [
+       0.0602,
+       1.7386,
+       0.127
+      ]
+     ]
+    },
+    {
+     "id": "Inferior nasal concha bones",
+     "name": "Inferior nasal concha bones",
+     "triangles": 4568,
+     "bounds": [
+      [
+       -0.0166,
+       1.5441,
+       0.0411
+      ],
+      [
+       0.0166,
+       1.5605,
+       0.0785
+      ]
+     ]
+    },
+    {
+     "id": "Lacrimal bones",
+     "name": "Lacrimal bones",
+     "triangles": 3856,
+     "bounds": [
+      [
+       -0.0181,
+       1.5761,
+       0.084
+      ],
+      [
+       0.0181,
+       1.6026,
+       0.0955
+      ]
+     ]
+    },
+    {
+     "id": "Lower canines",
+     "name": "Lower canines",
+     "triangles": 1868,
+     "bounds": [
+      [
+       -0.0166,
+       1.4889,
+       0.1087
+      ],
+      [
+       0.0166,
+       1.5149,
+       0.1238
+      ]
+     ]
+    },
+    {
+     "id": "Lower first molar teeth",
+     "name": "Lower first molar teeth",
+     "triangles": 2128,
+     "bounds": [
+      [
+       -0.0286,
+       1.5007,
+       0.09
+      ],
+      [
+       0.0286,
+       1.5197,
+       0.1045
+      ]
+     ]
+    }
+   ],
+   "bounds": [
+    [
+     -0.1143,
+     1.4638,
+     -0.1434
+    ],
+    [
+     0.1142,
+     1.7451,
+     0.1604
+    ]
+   ]
+  },
+  {
+   "id": "skull-base",
+   "file": "colored-skull-base.glb",
+   "names": {
+    "en": "Skull base",
+    "si": "හිස්කබලේ පාදම",
+    "ta": "மண்டையோட்டின் அடித்தளம்"
+   },
+   "summary": {
+    "en": "The floor of the cranial cavity, where the cranial nerves leave the skull.",
+    "si": "කපාල කුහරයේ බිම, කපාල ස්නායු හිස්කබලෙන් පිටවන ස්ථානය.",
+    "ta": "மண்டையோட்டு குழியின் தளம், மூளை நரம்புகள் வெளியேறும் இடம்."
+   },
+   "bytes": 1149684,
+   "structures": [
+    {
+     "id": "Ethmoid Bone",
+     "name": "Ethmoid Bone",
+     "triangles": 25344,
+     "bounds": [
+      [
+       -0.0172,
+       1.5743,
+       0.0352
+      ],
+      [
+       0.0172,
+       1.6108,
+       0.0826
+      ]
+     ]
+    },
+    {
+     "id": "Frontal bone",
+     "name": "Frontal bone",
+     "triangles": 4754,
+     "bounds": [
+      [
+       -0.0584,
+       1.5988,
+       0.035
+      ],
+      [
+       0.0584,
+       1.6324,
+       0.087
+      ]
+     ]
+    },
+    {
+     "id": "Inferior nasal concha bones",
+     "name": "Inferior nasal concha bones",
+     "triangles": 4568,
+     "bounds": [
+      [
+       -0.0166,
+       1.5641,
+       0.0411
+      ],
+      [
+       0.0166,
+       1.5805,
+       0.0785
+      ]
+     ]
+    },
+    {
+     "id": "Lacrimal bones",
+     "name": "Lacrimal bones",
+     "triangles": 3856,
+     "bounds": [
+      [
+       -0.0181,
+       1.5761,
+       0.064
+      ],
+      [
+       0.0181,
+       1.6026,
+       0.0755
+      ]
+     ]
+    },
+    {
+     "id": "Lower canines",
+     "name": "Lower canines",
+     "triangles": 1868,
+     "bounds": [
+      [
+       -0.0166,
+       1.5089,
+       0.0687
+      ],
+      [
+       0.0166,
+       1.5349,
+       0.0838
+      ]
+     ]
+    },
+    {
+     "id": "Lower first molar teeth",
+     "name": "Lower first molar teeth",
+     "triangles": 2128,
+     "bounds": [
+      [
+       -0.0286,
+       1.5207,
+       0.05
+      ],
+      [
+       0.0286,
+       1.5397,
+       0.0645
+      ]
+     ]
+    }
+   ],
+   "bounds": [
+    [
+     -0.0743,
+     1.5038,
+     -0.1034
+    ],
+    [
+     0.0741,
+     1.6324,
+     0.1004
+    ]
+   ]
+  },
+  {
+   "id": "vertebrae",
+   "file": "vertebrae.glb",
+   "names": {
+    "en": "Vertebrae compared",
+    "si": "කශේරුකා සැසඳීම",
+    "ta": "முள்ளெலும்புகள் ஒப்பீடு"
+   },
+   "summary": {
+    "en": "A cervical, a thoracic and a lumbar vertebra side by side.",
+    "si": "ගැබ්බර, උරස් හා කටි කශේරුකා තුනක් අසල අසල.",
+    "ta": "கழுத்து, மார்பு, இடுப்பு முள்ளெலும்புகள் அருகருகே."
+   },
+   "bytes": 212988,
+   "structures": [
+    {
+     "id": "Cervical vertebra (C4)",
+     "name": "Cervical vertebra (C4)",
+     "triangles": 6576,
+     "bounds": [
+      [
+       -0.0287,
+       1.3333,
+       -0.0444
+      ],
+      [
+       0.0287,
+       1.3586,
+       0.0076
+      ]
+     ]
+    },
+    {
+     "id": "Lumbar vertebra (L3)",
+     "name": "Lumbar vertebra (L3)",
+     "triangles": 7988,
+     "bounds": [
+      [
+       -0.0418,
+       1.2091,
+       -0.0653
+      ],
+      [
+       0.0418,
+       1.2531,
+       0.0191
+      ]
+     ]
+    },
+    {
+     "id": "Thoracic vertebra (T7)",
+     "name": "Thoracic vertebra (T7)",
+     "triangles": 7968,
+     "bounds": [
+      [
+       -0.0373,
+       1.2574,
+       -0.0506
+      ],
+      [
+       0.0373,
+       1.3174,
+       0.0152
+      ]
+     ]
+    }
+   ],
+   "bounds": [
+    [
+     -0.0418,
+     1.2091,
+     -0.0653
+    ],
+    [
+     0.0418,
+     1.3586,
+     0.0191
+    ]
+   ]
+  }
+ ]
+}

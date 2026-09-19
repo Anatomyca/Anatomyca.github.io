@@ -59,5 +59,10 @@
   "reveal": "Spotlight",
   "dockSystems": "Systems",
   "dockDetail": "Detail",
-  "dockTools": "Tools"
+  "dockTools": "Tools",
+  "models": "Models",
+  "wholeBody": "Whole body",
+  "wholeBodySummary": "Every system, 2,234 structures. A published reference dataset.",
+  "dockModels": "Models",
+  "reviewed": "Reviewed by anatomists"
 }

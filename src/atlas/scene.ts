@@ -8,6 +8,9 @@ import {
 } from './renderer';
 import { baseOpacityOf, LITE_SYSTEMS } from './systems';
 import { buildIndex, resolve, systemsOf, type AtlasIndex, type Selection } from './selection';
+import {
+  loadStudyModel, type LoadedStudyModel, type StudyModel,
+} from './studyModels';
 
 /**
  * The anatomy scene.
@@ -33,6 +36,14 @@ export interface AnatomyScene {
   setSystemVisible(system: string, visible: boolean): void;
   /** Accepts an element mesh id or an FMA concept id. */
   select(id: string | null, options?: { focus?: boolean }): void;
+  /**
+   * Show an anatomist-reviewed study model instead of the whole body, or
+   * null to go back to it. The two use different coordinate scales — 1.70 m
+   * against 1.75 m — so showing both at once would double every bone
+   * slightly out of register.
+   */
+  showStudyModel(model: StudyModel | null): Promise<void>;
+  studyModelId(): string | null;
   focus(id: string): void;
   getSelection(): Selection | null;
   setIsolate(on: boolean): void;
@@ -124,6 +135,9 @@ export async function createScene(
 
   let selection: Selection | null = null;
   let selectedElements = new Set<string>();
+  let study: LoadedStudyModel | null = null;
+  const studyRoot = new THREE.Group();
+  scene.add(studyRoot);
   let hovered: string | null = null;
   let isolate = false;
   let reveal = true;
@@ -159,6 +173,23 @@ export async function createScene(
 
   let framed = false;
 
+  /**
+   * Frame an arbitrary box. A study model can be a whole skeleton or a single
+   * skull 20 cm tall, so a distance tuned for a 1.9 m body leaves the skull a
+   * speck in the middle of the screen.
+   */
+  function frameBox(box: THREE.Box3, fill = 0.85): void {
+    if (box.isEmpty()) return;
+    const centre = box.getCenter(new THREE.Vector3());
+    const size = box.getSize(new THREE.Vector3());
+    const vFov = (camera.fov * Math.PI) / 180;
+    const byHeight = size.y / 2 / Math.tan(vFov / 2);
+    const hFov = 2 * Math.atan(Math.tan(vFov / 2) * camera.aspect);
+    const byWidth = Math.max(size.x, size.z) / 2 / Math.tan(hFov / 2);
+    const distance = Math.max(byHeight, byWidth, 0.1) / fill;
+    moveTo(new THREE.Vector3(centre.x, centre.y, centre.z + distance), centre, 0);
+  }
+
   function resize(): void {
     const w = canvas.clientWidth || 1;
     const h = canvas.clientHeight || 1;
@@ -179,8 +210,25 @@ export async function createScene(
   new ResizeObserver(resize).observe(canvas);
   resize();
 
-  /** Push selection, hover, isolate and see-through into every batch. */
+  /** Push selection, hover, isolate and see-through into whatever is shown. */
   function refresh(): void {
+    if (study) {
+      const dimmed = reveal && selection !== null ? 0.2 : 1;
+      for (const [id, mesh] of study.meshes) {
+        const isSelected = selectedElements.has(id);
+        const hide = isolate && selection !== null && !isSelected;
+        mesh.visible = !hide;
+        const material = mesh.material as THREE.MeshStandardMaterial;
+        const opacity = isSelected ? 1 : Math.max(0.05, dimmed * (1 - xray * 0.9));
+        material.opacity = opacity;
+        material.transparent = opacity < 0.999;
+        material.depthWrite = !material.transparent;
+        material.emissive.setHex(isSelected ? 0x5a1a17 : id === hovered ? 0x2a1210 : 0x000000);
+      }
+      invalidate();
+      return;
+    }
+
     for (const batch of batches.values()) {
       const systemHidden = hiddenSystems.has(batch.system);
       batch.mesh.visible = !systemHidden;
@@ -326,6 +374,32 @@ export async function createScene(
   const api: AnatomyScene = {
     manifest,
     index,
+
+    async showStudyModel(model) {
+      study?.dispose();
+      studyRoot.clear();
+      study = null;
+
+      if (model) {
+        const loaded = await loadStudyModel(model);
+        study = loaded;
+        studyRoot.add(loaded.group);
+      }
+      // Only one body is ever on screen.
+      root.visible = study === null;
+      studyRoot.visible = study !== null;
+      selection = null;
+      selectedElements = new Set();
+      refresh();
+
+      if (study) {
+        frameBox(new THREE.Box3().setFromObject(study.group));
+      } else {
+        api.resetView();
+      }
+    },
+
+    studyModelId: () => study?.model.id ?? null,
     loadSystem,
     unloadSystem,
     isLoaded: (system) => batches.has(system),
@@ -337,6 +411,20 @@ export async function createScene(
     },
 
     select(id, options) {
+      if (study && id !== null) {
+        // Study structures are addressed by mesh name, not by concept id.
+        const mesh = study.meshes.get(id);
+        if (!mesh) return;
+        selection = {
+          kind: 'element', id, name: id, elements: [id],
+          system: study.model.id,
+        };
+        selectedElements = new Set([id]);
+        if (options?.focus) api.focus(id);
+        refresh();
+        events.onSelect?.(id);
+        return;
+      }
       if (id === null) {
         selection = null;
         selectedElements = new Set();
@@ -358,6 +446,16 @@ export async function createScene(
     getSelection: () => selection,
 
     focus(id) {
+      if (study) {
+        const mesh = study.meshes.get(id);
+        const box = mesh?.geometry.boundingBox;
+        if (!mesh || !box) return;
+        const centre = box.getCenter(new THREE.Vector3());
+        const radius = Math.max(0.02, box.getSize(new THREE.Vector3()).length() / 2);
+        const direction = camera.position.clone().sub(controls.target).normalize();
+        moveTo(centre.clone().add(direction.multiplyScalar(Math.max(0.15, radius * 3.2))), centre);
+        return;
+      }
       const target = resolve(index, id);
       if (!target) return;
       // Frame the whole selection, which for a concept is all its meshes.

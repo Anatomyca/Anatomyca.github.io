@@ -148,3 +148,46 @@ export function buildSearch(
     },
   };
 }
+
+/**
+ * Search within a study model.
+ *
+ * These carry plain English mesh names and no translations, so the index is
+ * small and the matching simple — a substring and a romanised skeleton is
+ * enough for 144 bones, where the whole body needs a real inverted index.
+ */
+export function buildStudySearch(
+  structures: readonly { id: string; name: string }[],
+): AtlasSearch {
+  const rows = structures.map((s) => ({
+    id: s.id,
+    label: s.name,
+    haystack: normalise(s.name),
+    roman: romanKey(normalise(s.name).replace(/\s+/g, '')),
+  }));
+
+  return {
+    search(query, limit = 12) {
+      const q = normalise(query);
+      if (!q) return [];
+      const key = romanKey(q.replace(/\s+/g, ''));
+      const scored = rows
+        .map((row) => {
+          let score = 0;
+          if (row.haystack === q) score = 100;
+          else if (row.haystack.startsWith(q)) score = 60;
+          else if (row.haystack.includes(q)) score = 40;
+          else if (key && row.roman.includes(key)) score = 10;
+          return { row, score };
+        })
+        .filter((hit) => hit.score > 0)
+        .sort((a, b) => b.score - a.score || a.row.label.localeCompare(b.row.label))
+        .slice(0, limit);
+
+      return scored.map(({ row, score }) => ({
+        id: row.id, score, label: row.label,
+        terms: [], queryTerms: [], match: {},
+      })) as unknown as SearchResult[];
+    },
+  };
+}

@@ -6,6 +6,27 @@ stored once in `data-sources.json` and rendered from there, so it cannot drift.
 
 ## Geometry currently shipped
 
+**Open3Dmodel study models** — CC BY-SA 4.0. Five anatomist-reviewed models
+carrying 234 individually named structures: the full skeleton, the skull in
+three presentations (coloured, exploded, and the cranial base), and three
+representative vertebrae. Graded **A** — every structure reviewed by one to
+three subject-expert anatomists against Moore, Gray, Netter, Prometheus,
+Sobotta, dissection specimens and the literature.
+
+> Open3Dmodel, by the anatomy departments of Leiden UMC, UMC Utrecht,
+> Maastricht, KU Leuven, Amsterdam UMC, Radboud UMC and Ghent, licensed
+> under CC BY-SA 4.0
+
+https://anatomytool.org/open3dmodel-about
+
+Because these are ShareAlike, **the whole geometry pack is CC BY-SA 4.0**.
+See [`LICENSE-DATA.md`](../LICENSE-DATA.md).
+
+Only the geometry is used. Open3Dmodel's own web viewer is GPL-3.0 and no
+part of it appears in this codebase; its muscle textures are NonCommercial
+and are excluded.
+
+
 **BodyParts3D Release 4.0** — CC BY 4.0. The whole body: 2,234 element
 meshes across fifteen systems, 2,288,268 triangles simplified from 6,681,030,
 carrying 3,432 named FMA concepts. Graded **B** throughout — a published

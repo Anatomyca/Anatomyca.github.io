@@ -1,6 +1,7 @@
 import { useEffect, useRef } from 'react';
 import { createScene, type AnatomyScene } from '../atlas/scene';
 import { resolve } from '../atlas/selection';
+import { loadCatalogue } from '../atlas/studyModels';
 import { useAtlas } from '../state/store';
 
 /**
@@ -25,6 +26,8 @@ export function Viewport() {
   const setReady = useAtlas((s) => s.setReady);
   const setManifest = useAtlas((s) => s.setManifest);
   const setLoading = useAtlas((s) => s.setLoading);
+  const studyModel = useAtlas((s) => s.studyModel);
+  const setStudyCatalogue = useAtlas((s) => s.setStudyCatalogue);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -37,6 +40,12 @@ export function Viewport() {
       if (disposed) { scene.dispose(); return; }
       sceneRef.current = scene;
       setManifest(scene.manifest);
+      // The study-model index is small and needed before the picker can be
+      // drawn, so it is fetched alongside the body rather than on demand.
+      void loadCatalogue().then(setStudyCatalogue).catch(() => {
+        // Study models are an addition, not a prerequisite: the body works
+        // without them.
+      });
 
       // Stream the opening systems one at a time, so the first of them is on
       // screen while the rest are still arriving.
@@ -62,11 +71,22 @@ export function Viewport() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // Swap between the whole body and a reviewed study model.
+  useEffect(() => {
+    const scene = sceneRef.current;
+    if (!scene) return;
+    if (scene.studyModelId() === (studyModel?.id ?? null)) return;
+    void scene.showStudyModel(studyModel);
+  }, [studyModel]);
+
   // Load or reveal systems as the reader turns them on.
   useEffect(() => {
     const scene = sceneRef.current;
     if (!scene) return;
     let cancelled = false;
+
+    // Systems belong to the whole body; a study model has none.
+    if (studyModel) return;
 
     void (async () => {
       for (const system of shown) {
@@ -91,7 +111,7 @@ export function Viewport() {
     })();
 
     return () => { cancelled = true; };
-  }, [shown, setLoading]);
+  }, [shown, setLoading, studyModel]);
 
   useEffect(() => { sceneRef.current?.select(selected, { focus: false }); }, [selected]);
 

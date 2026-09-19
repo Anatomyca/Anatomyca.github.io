@@ -4,6 +4,8 @@ import { Viewport } from './Viewport';
 import { DetailSheet } from './DetailSheet';
 import { SearchBox } from './SearchBox';
 import { SystemRail } from './SystemRail';
+import { ModelPicker } from './ModelPicker';
+import { StructureList } from './StructureList';
 import { LanguageSwitch } from './LanguageSwitch';
 import { Controls } from './Controls';
 import { MobileDock } from './MobileDock';
@@ -22,6 +24,7 @@ import { loadBookmarks, saveBookmarks } from '../lk/offline/storage';
 export function App() {
   const { t } = useTranslation();
   const ready = useAtlas((s) => s.ready);
+  const studyModel = useAtlas((s) => s.studyModel);
   const loading = useAtlas((s) => s.loading);
   const syncFromHash = useAtlas((s) => s.syncFromHash);
   const bookmarks = useAtlas((s) => s.bookmarks);
@@ -57,8 +60,11 @@ export function App() {
       </header>
 
       <div className="relative flex min-h-0 flex-1 flex-col md:flex-row">
-        <aside className="hidden w-56 shrink-0 overflow-y-auto border-r border-edge md:block">
-          <SystemRail />
+        <aside className="hidden w-60 shrink-0 overflow-y-auto border-r border-edge md:block">
+          <ModelPicker />
+          <div className="border-t border-edge">
+            {studyModel ? <StructureList /> : <SystemRail />}
+          </div>
         </aside>
 
         <main className="relative min-h-0 flex-1">
