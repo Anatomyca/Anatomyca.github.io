@@ -6,6 +6,7 @@ import { BP3D_GRADE, BP3D_SOURCE } from '../atlas/manifest';
 import { localNamesForName } from '../atlas/names';
 import { BP3D_SYSTEM_BY_ID } from '../atlas/systems';
 import { breadcrumbFor } from '../atlas/selection';
+import { modelName } from '../atlas/studyModels';
 import { sentenceCase } from './text';
 
 /**
@@ -19,12 +20,46 @@ import { sentenceCase } from './text';
 export function DetailSheet() {
   const { t, i18n } = useTranslation();
   const lang = useAtlas((s) => s.lang);
+  const studyModel = useAtlas((s) => s.studyModel);
   const selectedId = useAtlas((s) => s.selected);
   const index = useAtlas((s) => s.index);
   const selection = useAtlas((s) => s.selection)();
   const select = useAtlas((s) => s.select);
   const bookmarks = useAtlas((s) => s.bookmarks);
   const toggleBookmark = useAtlas((s) => s.toggleBookmark);
+
+  // A study model addresses structures by mesh name, not by concept id, and
+  // its geometry is reviewed — so it reports Grade A rather than the body's B.
+  if (studyModel && selectedId) {
+    const structure = studyModel.structures.find((s) => s.id === selectedId);
+    if (structure) {
+      return (
+        <section className="flex flex-col gap-4 p-5" aria-live="polite">
+          <header>
+            <h2 className="font-serif text-2xl leading-tight">{structure.name}</h2>
+            <p className="mt-0.5 text-sm text-muted">{modelName(studyModel, lang)}</p>
+          </header>
+
+          <GradeBadge grade="A" source="open3dmodel" />
+
+          <dl className="grid grid-cols-[auto_1fr] gap-x-4 gap-y-1 text-sm">
+            <dt className="text-muted">Triangles</dt>
+            <dd className="tabular-nums">{structure.triangles.toLocaleString()}</dd>
+          </dl>
+
+          <div className="flex flex-wrap gap-2 pt-1">
+            <button
+              onClick={() => toggleBookmark(structure.id)}
+              className="rounded border border-edge px-3 py-2 text-sm hover:border-saffron"
+              aria-pressed={bookmarks.has(structure.id)}
+            >
+              {bookmarks.has(structure.id) ? t('bookmarked') : t('bookmark')}
+            </button>
+          </div>
+        </section>
+      );
+    }
+  }
 
   if (!selection || !index || !selectedId) {
     return (

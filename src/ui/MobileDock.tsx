@@ -1,11 +1,13 @@
 import { useState, type ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import { SystemRail } from './SystemRail';
+import { ModelPicker } from './ModelPicker';
+import { StructureList } from './StructureList';
 import { DetailSheet } from './DetailSheet';
 import { Controls } from './Controls';
 import { useAtlas } from '../state/store';
 
-type Panel = 'systems' | 'detail' | 'tools' | null;
+type Panel = 'models' | 'systems' | 'detail' | 'tools' | null;
 
 /**
  * The phone layout.
@@ -20,6 +22,7 @@ export function MobileDock() {
   const { t } = useTranslation();
   const [panel, setPanel] = useState<Panel>(null);
   const selected = useAtlas((s) => s.selected);
+  const studyModel = useAtlas((s) => s.studyModel);
 
   // Short labels: the full words are long enough in Sinhala and Tamil to
   // break mid-word in a third-of-a-screen tab. Sheet headings use the full
@@ -27,7 +30,8 @@ export function MobileDock() {
   const tabs: {
     id: Exclude<Panel, null>; label: string; heading: string; icon: ReactNode;
   }[] = [
-    { id: 'systems', label: t('dockSystems'), heading: t('systems'), icon: <LayersIcon /> },
+    { id: 'models', label: t('dockModels'), heading: t('models'), icon: <BodyIcon /> },
+    { id: 'systems', label: t('dockSystems'), heading: studyModel ? t('parts') : t('systems'), icon: <LayersIcon /> },
     { id: 'detail', label: t('dockDetail'), heading: t('names'), icon: <InfoIcon /> },
     { id: 'tools', label: t('dockTools'), heading: t('dockTools'), icon: <SlidersIcon /> },
   ];
@@ -53,7 +57,8 @@ export function MobileDock() {
               {t('close')}
             </button>
           </div>
-          {panel === 'systems' && <SystemRail />}
+          {panel === 'models' && <ModelPicker />}
+          {panel === 'systems' && (studyModel ? <StructureList /> : <SystemRail />)}
           {panel === 'detail' && <DetailSheet />}
           {panel === 'tools' && <Controls variant="panel" />}
         </div>
@@ -92,6 +97,14 @@ const stroke = {
   fill: 'none', stroke: 'currentColor', strokeWidth: 1.8,
   strokeLinecap: 'round' as const, strokeLinejoin: 'round' as const,
 };
+
+function BodyIcon() {
+  return (
+    <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" {...stroke}>
+      <circle cx="12" cy="4.5" r="2.5" /><path d="M12 7v8M12 15l-3 6M12 15l3 6M7 10h10" />
+    </svg>
+  );
+}
 
 function LayersIcon() {
   return (

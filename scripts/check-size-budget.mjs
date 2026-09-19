@@ -21,7 +21,7 @@
  */
 import { readdir, readFile, stat } from 'node:fs/promises';
 import { gzipSync } from 'node:zlib';
-import { join, extname, basename } from 'node:path';
+import { join, extname, basename, sep } from 'node:path';
 
 const BUDGETS = {
   shellJsGzip: 300 * 1024,
@@ -42,6 +42,13 @@ const DEFAULT_SYSTEMS = [
 ];
 
 const COMPRESSIBLE = new Set(['.js', '.css', '.html', '.json', '.svg']);
+
+/**
+ * Fetched on demand, so they are not part of what a first visit costs: the
+ * study models are chosen deliberately from the model picker, and the Draco
+ * decoder only loads with the first of them.
+ */
+const LAZY = ['atlas/chunks', 'atlas/models', 'draco/'];
 
 async function walk(dir) {
   const out = [];
@@ -70,13 +77,17 @@ async function main() {
     const size = (await stat(file)).size;
     siteTotal += size;
 
-    const isChunk = file.includes(`atlas${join('/', 'chunks')}`) || file.includes('atlas/chunks');
-    if (isChunk) {
+    const normalised = file.split(sep).join('/');
+    const isChunk = normalised.includes('atlas/chunks');
+    const isLazy = LAZY.some((prefix) => normalised.includes(prefix));
+    if (isLazy) {
       if (size > BUDGETS.perChunk) {
         problems.push(`${file} is ${mb(size)}, over the ${mb(BUDGETS.perChunk)} per-chunk limit`);
       }
-      const system = basename(file).replace(/^system-|\.bin\.gz$/g, '');
-      if (DEFAULT_SYSTEMS.includes(system)) defaultChunks += size;
+      if (isChunk) {
+        const system = basename(file).replace(/^system-|\.bin\.gz$/g, '');
+        if (DEFAULT_SYSTEMS.includes(system)) defaultChunks += size;
+      }
       continue;
     }
 

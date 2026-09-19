@@ -4,10 +4,14 @@ import type { Bp3dManifest, Bp3dPart } from '../atlas/manifest';
 import { BP3D_SYSTEMS, LITE_SYSTEMS } from '../atlas/systems';
 import { buildHash, parseHash } from './deepLink';
 import { buildIndex, resolve, type AtlasIndex, type Selection } from '../atlas/selection';
+import type { StudyCatalogue, StudyModel } from '../atlas/studyModels';
 
 interface AtlasState {
   lang: Language;
   manifest: Bp3dManifest | null;
+  /** Anatomist-reviewed models shown instead of the whole body. */
+  studyCatalogue: StudyCatalogue | null;
+  studyModel: StudyModel | null;
   selected: string | null;
   /** Systems the reader has asked to see. Geometry streams in per system. */
   shown: ReadonlySet<string>;
@@ -24,6 +28,8 @@ interface AtlasState {
   selection(): Selection | null;
 
   setManifest(manifest: Bp3dManifest): void;
+  setStudyCatalogue(catalogue: StudyCatalogue): void;
+  setStudyModel(model: StudyModel | null): void;
   setLang(lang: Language): void;
   /** `focus` moves the camera. Set it for search and link opens, not taps. */
   select(id: string | null, options?: { focus?: boolean }): void;
@@ -47,6 +53,8 @@ export const useAtlas = create<AtlasState>((set, get) => ({
   lang: 'en',
   manifest: null,
   index: null,
+  studyCatalogue: null,
+  studyModel: null,
   selected: null,
   // A first visit shows a recognisable body; the vascular trees alone are
   // over a thousand structures and stream only when asked for.
@@ -70,6 +78,14 @@ export const useAtlas = create<AtlasState>((set, get) => ({
   },
 
   setManifest: (manifest) => set({ manifest, index: buildIndex(manifest) }),
+  setStudyCatalogue: (studyCatalogue) => set({ studyCatalogue }),
+
+  setStudyModel(model) {
+    // Switching bodies invalidates the selection: a structure in one is not
+    // a structure in the other.
+    set({ studyModel: model, selected: null });
+    history.replaceState(null, '', buildHash({ lang: get().lang }));
+  },
 
   setLang(lang) {
     set({ lang });

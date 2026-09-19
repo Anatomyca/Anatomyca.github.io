@@ -33,6 +33,7 @@ jobs:
       # Data gates. Geometry is processed offline and committed, so CI only
       # validates — it never has to run heavy mesh work inside the 10-minute
       # deployment timeout.
+      - run: node scripts/build-study-models.mjs
       - run: node scripts/validate-atlas.mjs
       - run: node scripts/validate-terms.mjs
       - run: node scripts/check-licences.mjs

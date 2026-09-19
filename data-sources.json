@@ -46,8 +46,8 @@
       "attribution": "Open3Dmodel, by the anatomy departments of Leiden UMC, UMC Utrecht, Maastricht, KU Leuven, Amsterdam UMC, Radboud UMC and Ghent, licensed under CC BY-SA 4.0",
       "grade": "A",
       "url": "https://anatomytool.org/open3dmodel-about",
-      "shipped": false,
-      "notes": "Every structure reviewed by one to three subject-expert anatomists against the standard reference works. ShareAlike: including it makes the whole geometry pack CC BY-SA 4.0. Its own web viewer is GPL-3.0 and must not be copied into this MIT codebase. Its muscle textures are NonCommercial and are excluded."
+      "shipped": true,
+      "notes": "Five anatomist-reviewed study models are shipped: the full named skeleton, the skull in three presentations (coloured, exploded, and the cranial base), and three representative vertebrae. 234 individually named structures, Grade A. Every structure was reviewed by one to three subject-expert anatomists against the standard reference works. SHIPPING THESE MAKES THE GEOMETRY PACK CC BY-SA 4.0 \u2014 see LICENSE-DATA.md. Its own web viewer is GPL-3.0 and must not be copied into this MIT codebase; its muscle textures are NonCommercial and are excluded. The GLB files declare no copyright string of their own, so attribution follows the project's published licence rather than file metadata."
     },
     "z-anatomy": {
       "label": "Z-Anatomy",

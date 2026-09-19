@@ -1,6 +1,6 @@
 import { useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { buildSearch } from '../search/index';
+import { buildSearch, buildStudySearch } from '../search/index';
 import { useAtlas } from '../state/store';
 import { sentenceCase } from './text';
 
@@ -15,15 +15,20 @@ export function SearchBox() {
   const { t } = useTranslation();
   const lang = useAtlas((s) => s.lang);
   const manifest = useAtlas((s) => s.manifest);
+  const studyModel = useAtlas((s) => s.studyModel);
   const select = useAtlas((s) => s.select);
   const [query, setQuery] = useState('');
   const [open, setOpen] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  const search = useMemo(
-    () => (manifest ? buildSearch(manifest.parts, lang, manifest.concepts) : null),
-    [manifest, lang],
-  );
+  // Search follows whatever is on screen: offering heart concepts while a
+  // skull is shown would return structures the reader cannot select.
+  const search = useMemo(() => {
+    if (studyModel) {
+      return buildStudySearch(studyModel.structures);
+    }
+    return manifest ? buildSearch(manifest.parts, lang, manifest.concepts) : null;
+  }, [manifest, lang, studyModel]);
   const results = useMemo(
     () => (search && query.trim() ? search.search(query, 8) : []),
     [query, search],
