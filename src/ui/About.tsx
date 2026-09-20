@@ -32,11 +32,28 @@ interface Reference {
   note?: string;
 }
 
+interface StudyModel {
+  id: string;
+  structures: number;
+  names: Record<string, string>;
+  grade: string | null;
+  /** Generated per model, so each one is credited where it is being read. */
+  credit: {
+    label: string;
+    attribution: string;
+    licence: string;
+    licenceUrl: string;
+    url: string;
+    creators?: string[];
+    reviewedBy?: string;
+  } | null;
+}
+
 interface Credits {
   packLicence: string;
   packLicenceUrl: string;
   sources: Source[];
-  studyModels: { id: string; structures: number; names: Record<string, string> }[];
+  studyModels: StudyModel[];
   references: Reference[];
 }
 
@@ -108,6 +125,61 @@ export function About() {
               ))}
             </ul>
           </div>
+
+          {credits.studyModels.length > 0 && (
+            <div>
+              <h3 className="mb-2 font-medium">{t('reviewedModels')}</h3>
+              <ul className="flex flex-col gap-3">
+                {credits.studyModels.map((model) => (
+                  <li key={model.id} className="rounded border border-edge bg-panel/50 p-3">
+                    <p className="font-medium">
+                      {model.names[i18n.language] ?? model.names['en']}
+                      {model.grade && (
+                        <span className="ml-2 rounded bg-saffron/20 px-1.5 py-0.5 text-xs text-saffron">
+                          {t('grade')} {model.grade}
+                        </span>
+                      )}
+                    </p>
+                    <p className="mt-1 text-xs text-muted">
+                      {t('namedStructures', { count: model.structures })}
+                    </p>
+
+                    {model.credit ? (
+                      <>
+                        <p className="mt-2 leading-relaxed text-muted">{model.credit.attribution}</p>
+                        {model.credit.reviewedBy && (
+                          <p className="mt-1 leading-relaxed text-muted">
+                            <span className="text-bone">{t('reviewedBy')}: </span>
+                            {model.credit.reviewedBy}
+                          </p>
+                        )}
+                        <p className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs">
+                          <a
+                            href={model.credit.licenceUrl}
+                            target="_blank"
+                            rel="noreferrer noopener"
+                            className="underline decoration-dotted hover:text-saffron"
+                          >
+                            {model.credit.licence}
+                          </a>
+                          <a
+                            href={model.credit.url}
+                            target="_blank"
+                            rel="noreferrer noopener"
+                            className="truncate underline decoration-dotted hover:text-saffron"
+                          >
+                            {model.credit.url.replace(/^https?:\/\//, '')}
+                          </a>
+                        </p>
+                      </>
+                    ) : (
+                      <p className="mt-2 text-muted">{t('noCredit')}</p>
+                    )}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
 
           <div>
             <h3 className="mb-1 font-medium">{t('licence')}</h3>

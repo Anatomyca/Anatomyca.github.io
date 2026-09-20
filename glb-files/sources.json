@@ -1,0 +1,23 @@
+{
+  "$comment": "Intake manifest for glb-files/. Every .glb in this folder must be keyed here by filename or the build refuses it — an unattributed mesh in a CC BY-SA pack is a licence breach. 'source' names a key in ../data-sources.json, which is where the licence and the licensor's required attribution string live, so neither can drift or be overstated here. See glb-readme.md.",
+  "$example": {
+    "lungs-lobes.glb": {
+      "id": "lungs",
+      "source": "open3dmodel",
+      "names": {
+        "en": "Lungs",
+        "si": "පෙනහළු",
+        "ta": "நுரையீரல்கள்"
+      },
+      "summary": {
+        "en": "The five lobes, with the fissures between them.",
+        "si": "පෙති පහ, ඒවා අතර විවර සමඟ.",
+        "ta": "ஐந்து மடல்கள், அவற்றுக்கிடையேயான பிளவுகளுடன்."
+      },
+      "grade": "A",
+      "reviewedBy": "Anatomy department, Leiden UMC",
+      "sourceUrl": "https://anatomytool.org/open3dmodel-learn"
+    }
+  },
+  "models": {}
+}

@@ -65,3 +65,65 @@ describe('credits', () => {
     expect(CREDITS.references.map((r) => r.citation).join(' ')).toContain('Mitsuhashi');
   });
 });
+
+/**
+ * Every study model must carry its own attribution. The pack notice is not
+ * enough on its own: a student looking at one reviewed model should be able
+ * to see who made it and who checked it, and a Grade A badge is a claim
+ * about human review that needs a name behind it.
+ */
+interface StudyModel {
+  id: string;
+  structures: number;
+  grade: string | null;
+  credit: {
+    source: string; attribution: string; licence: string;
+    licenceUrl: string; url: string; reviewedBy?: string;
+  } | null;
+}
+
+const MODELS = (credits as unknown as { studyModels: StudyModel[] }).studyModels;
+
+describe('study model credits', () => {
+  it('attributes every shipped study model', () => {
+    expect(MODELS.length).toBeGreaterThan(0);
+    for (const model of MODELS) {
+      expect(model.credit, `${model.id} ships with no credit`).not.toBeNull();
+      expect(model.credit?.attribution.trim()).not.toBe('');
+      expect(model.credit?.licenceUrl).toMatch(/^https?:\/\//);
+      expect(model.credit?.url).toMatch(/^https?:\/\//);
+    }
+  });
+
+  it('names a source that data-sources.json actually defines', () => {
+    const known = new Set(Object.keys(sources.sources));
+    for (const model of MODELS) {
+      expect(known).toContain(model.credit?.source);
+    }
+  });
+
+  it('carries the licence its source carries, not a weaker one', () => {
+    const defined = sources.sources as Record<string, { licence: string }>;
+    for (const model of MODELS) {
+      const source = model.credit?.source;
+      if (!source) continue;
+      expect(model.credit?.licence).toBe(defined[source]?.licence);
+    }
+  });
+
+  it('never claims Grade A without naming who reviewed it', () => {
+    for (const model of MODELS.filter((m) => m.grade === 'A')) {
+      expect(
+        model.credit?.reviewedBy?.trim(),
+        `${model.id} is badged Grade A but names no reviewer`,
+      ).toBeTruthy();
+    }
+  });
+
+  it('ships no model under a licence outside the approved set', () => {
+    const approved = new Set(sources.approvedLicences);
+    for (const model of MODELS) {
+      expect(approved).toContain(model.credit?.licence);
+    }
+  });
+});

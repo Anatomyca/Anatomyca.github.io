@@ -73,5 +73,10 @@
   "codeLicenceNote": "The application code is MIT. Anything built from the data must carry the same licence.",
   "dockAbout": "Credits",
   "loadFailed": "The atlas could not be loaded. Check your connection and try again.",
-  "retry": "Try again"
+  "retry": "Try again",
+  "reviewedModels": "Reviewed models",
+  "grade": "Grade",
+  "namedStructures": "{{count}} named structures",
+  "reviewedBy": "Reviewed by",
+  "noCredit": "No source recorded for this model."
 }

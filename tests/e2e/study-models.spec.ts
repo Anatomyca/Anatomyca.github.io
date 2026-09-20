@@ -101,3 +101,16 @@ test('shows the credits the licences require, in the interface', async ({ page }
   // And the disclaimer, which a medical student needs to have seen.
   await expect(panel).toContainText(/not a diagnostic/i);
 });
+
+test('credits each reviewed model where the student is reading it', async ({ page }) => {
+  // The pack notice alone does not tell a student who checked the model in
+  // front of them, and a Grade A badge is a claim about human review.
+  await open(page);
+  await page.getByRole('button', { name: /^(About|පිළිබඳව|பற்றி|Credits|ස්තුති|நன்றி)$/ }).first().click();
+
+  const panel = page.locator('#detail, [role=dialog], main').last();
+  await expect(panel).toContainText(/Reviewed models|සමාලෝචනය කළ ආකෘති|மதிப்பாய்வு செய்யப்பட்ட மாதிரிகள்/);
+  await expect(panel).toContainText(/(Grade|ශ්‍රේණිය|தரம்)\s*A/);
+  await expect(panel).toContainText(/Reviewed by|සමාලෝචනය කළේ|மதிப்பாய்வு செய்தவர்/);
+  await expect(panel).toContainText('144');
+});

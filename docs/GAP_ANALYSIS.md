@@ -68,7 +68,9 @@ include newly modelled nerves, and its spinal cord section.
 
 1. Collect the models by hand — see `docs/adding-models.md`. The hosts are
    unreachable from a sandboxed build environment.
-2. Drop the GLB into `public/atlas/models/`, add a `CATALOGUE` entry.
+2. Drop the GLB into `glb-files/` and describe it in `glb-files/sources.json`
+   — filename, id, source, trilingual name and summary. The build refuses a
+   model that names no source, so nothing ships unattributed.
 3. `npm run atlas:models && npm run atlas:validate`.
 4. Update this file and the system's note in `src/data/coverage-notes.json`.
 
