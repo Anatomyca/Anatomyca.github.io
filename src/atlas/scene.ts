@@ -7,6 +7,7 @@ import {
   type SystemBatch,
 } from './renderer';
 import { baseOpacityOf, LITE_SYSTEMS } from './systems';
+import { isDoubleTap } from './camera';
 import { buildIndex, resolve, systemsOf, type AtlasIndex, type Selection } from './selection';
 import {
   loadStudyModel, type LoadedStudyModel, type StudyModel,
@@ -51,20 +52,39 @@ export interface AnatomyScene {
   setReveal(on: boolean): void;
   setXray(value: number): void;
   setSpin(on: boolean): void;
-  setView(name: 'front' | 'back' | 'left' | 'right' | 'top'): void;
+  setView(name: ViewName): void;
   resetView(): void;
+  /**
+   * Dolly by a factor of the current distance — 0.7 closer, 1.4 further.
+   * Relative rather than absolute so one press feels the same whether the
+   * reader is looking at a whole body or at one tooth.
+   */
+  zoomBy(factor: number): void;
+  /** Orbit by whole degrees, for the arrow keys. */
+  orbitBy(deltaTheta: number, deltaPhi: number): void;
+  /** A PNG of exactly what is on screen, for a student's notes. */
+  snapshot(): Promise<Blob | null>;
   partById(id: string): Bp3dPart | undefined;
   invalidate(): void;
   dispose(): void;
 }
 
+/**
+ * The standard anatomical views. Left and right are the *body's*, which is
+ * the convention a student is taught and the opposite of the viewer's own —
+ * the left lateral view looks at the body's left side, from the reader's
+ * right.
+ */
 const VIEWS = {
   front: { theta: 0, phi: 1.5 },
   back: { theta: Math.PI, phi: 1.5 },
   left: { theta: Math.PI / 2, phi: 1.5 },
   right: { theta: -Math.PI / 2, phi: 1.5 },
   top: { theta: 0, phi: 0.22 },
+  bottom: { theta: 0, phi: Math.PI - 0.22 },
 } as const;
+
+export type ViewName = keyof typeof VIEWS;
 
 const BODY_CENTRE = new THREE.Vector3(0, 0.95, 0);
 const easeInOut = (t: number): number =>
@@ -308,16 +328,34 @@ export async function createScene(
     return null;
   }
 
-  let down: { x: number; y: number; t: number } | null = null;
+  let down: { x: number; y: number; t: number; double: boolean } | null = null;
+  /** The previous press, for spotting a double-tap. */
+  let lastDown: { x: number; y: number; t: number } | null = null;
+
   canvas.addEventListener('pointerdown', (e) => {
-    down = { x: e.clientX, y: e.clientY, t: performance.now() };
+    const now = performance.now();
+    const double = isDoubleTap({ x: e.clientX, y: e.clientY, t: now }, lastDown);
+    down = { x: e.clientX, y: e.clientY, t: now, double };
+    lastDown = double ? null : { x: e.clientX, y: e.clientY, t: now };
   });
+
   canvas.addEventListener('pointerup', (e) => {
     if (!down) return;
     const moved = Math.hypot(e.clientX - down.x, e.clientY - down.y);
     const quick = performance.now() - down.t < 700;
+    const double = down.double;
     down = null;
     if (moved > 8 || !quick) return;  // a drag is an orbit, not a tap
+
+    // Double-tap zooms in on whatever was tapped. A reader holding a phone
+    // one-handed cannot pinch, and this is the gesture they already expect
+    // from every map they have used.
+    if (double) {
+      const id = pick(e.clientX, e.clientY);
+      if (id) { api.select(id); api.focus(id); }
+      else api.zoomBy(0.72);
+      return;
+    }
     api.select(pick(e.clientX, e.clientY));
   });
 
@@ -494,7 +532,46 @@ export async function createScene(
     },
 
     resetView() {
+      // A study model is not the body and is not 1.75 m tall, so resetting
+      // to the body's framing would send a skull off into the distance.
+      if (study) {
+        frameBox(new THREE.Box3().setFromObject(study.group));
+        return;
+      }
       moveTo(new THREE.Vector3(0, BODY_CENTRE.y, fitDistance(camera.aspect)), BODY_CENTRE.clone());
+    },
+
+    zoomBy(factor) {
+      const offset = camera.position.clone().sub(controls.target);
+      const distance = THREE.MathUtils.clamp(
+        offset.length() * factor, controls.minDistance, controls.maxDistance,
+      );
+      moveTo(controls.target.clone().add(offset.setLength(distance)), controls.target.clone(), 260);
+    },
+
+    orbitBy(deltaTheta, deltaPhi) {
+      const offset = camera.position.clone().sub(controls.target);
+      const spherical = new THREE.Spherical().setFromVector3(offset);
+      spherical.theta += deltaTheta;
+      // Stop short of the poles, where the orbit flips and the body rolls.
+      spherical.phi = THREE.MathUtils.clamp(spherical.phi + deltaPhi, 0.05, Math.PI - 0.05);
+      moveTo(
+        controls.target.clone().add(new THREE.Vector3().setFromSpherical(spherical)),
+        controls.target.clone(),
+        200,
+      );
+    },
+
+    async snapshot() {
+      // The drawing buffer is not preserved between frames, so render once
+      // more and read it in the same tick or the PNG comes back blank.
+      renderer.clear();
+      renderer.render(scene, camera);
+      if (reveal && selection !== null) {
+        renderer.clearDepth();
+        renderer.render(overlay, camera);
+      }
+      return new Promise((done) => canvas.toBlob(done, 'image/png'));
     },
     partById: (id) => partsById.get(id),
     invalidate,

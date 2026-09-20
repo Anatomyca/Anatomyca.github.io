@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { SHORTCUTS } from './useShortcuts';
 
 /**
  * Credits, licences and references.
@@ -83,6 +84,19 @@ export function About() {
       </p>
 
       {failed && <p className="text-muted">{t('noMatch')}</p>}
+
+      {/* Listed because a shortcut nobody can discover is not a feature. */}
+      <div>
+        <h3 className="mb-2 font-medium">{t('keyboard')}</h3>
+        <dl className="grid grid-cols-[auto_1fr] gap-x-4 gap-y-1">
+          {SHORTCUTS.map((shortcut) => (
+            <div key={shortcut.keys} className="col-span-2 grid grid-cols-subgrid">
+              <dt className="whitespace-nowrap font-mono text-xs text-bone">{shortcut.keys}</dt>
+              <dd className="text-muted">{t(shortcut.labelKey)}</dd>
+            </div>
+          ))}
+        </dl>
+      </div>
 
       {credits && (
         <>
