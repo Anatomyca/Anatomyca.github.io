@@ -41,6 +41,17 @@ async function showSystems(page: Page) {
 const panelOf = (page: Page) =>
   page.locator('#detail:visible, [role=dialog]:visible').first();
 
+/**
+ * After a model is chosen, its parts are in the rail on wide screens but in
+ * the dock's own sheet on phones — where the model picker stays open over
+ * them, so the part is not reachable until that sheet is raised.
+ */
+async function showParts(page: Page, part: string) {
+  const target = page.getByRole('button', { name: part }).first();
+  if (await target.isVisible().catch(() => false)) return;
+  await page.getByRole('button', { name: /^(Systems|පද්ධති|தொகுதி(கள்)?)$/ }).first().click();
+}
+
 const MODEL = (name: RegExp) =>
   (page: Page) => page.getByRole('button', { name }).first();
 
@@ -140,6 +151,7 @@ test('never reports a community model as anatomist-reviewed', async ({ page }) =
   await showPicker(page);
   await MODEL(/Lungs/)(page).click();
   await page.waitForTimeout(3500);
+  await showParts(page, 'Lung, part 1');
   await page.getByRole('button', { name: 'Lung, part 1' }).first().click();
 
   const detail = panelOf(page);
