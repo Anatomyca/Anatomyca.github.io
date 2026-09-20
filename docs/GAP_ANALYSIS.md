@@ -9,7 +9,7 @@ Regenerate the counts with `node scripts/validate-atlas.mjs` and
 
 ## Verified gaps
 
-### Lungs — no lung tissue exists · **critical**
+### Lungs — no lung tissue in the reference body · **partly closed**
 
 The respiratory system holds 119 meshes:
 
@@ -30,8 +30,15 @@ the dataset has.
 > in that release. In the pack distributed by the upstream Human Atlas
 > project, they are not present. Checked directly; see the table above.
 
-**What would fill it:** AnatomyTOOL's CT-derived *Normal lungs* and *Anatomy
-of the airways* models, or a future Open3Dmodel thorax region.
+**Partly closed.** The **Lungs** study model (`realistic_human_lungs.glb`,
+CC BY 4.0, by neshallads) now gives both lungs as whole organs with the
+trachea and larynx — the only lung surface in the atlas. It is Grade C: an
+artist made it, no anatomist has checked it, and its lobes are not separated.
+The respiratory coverage note points a reader to it.
+
+**What would still fill it properly:** lobed lung geometry a specialist has
+checked — AnatomyTOOL's CT-derived *Normal lungs* and *Anatomy of the
+airways* models, or a future Open3Dmodel thorax region.
 
 ### Peripheral nerves — none exist · **critical**
 
@@ -68,7 +75,9 @@ include newly modelled nerves, and its spinal cord section.
 
 1. Collect the models by hand — see `docs/adding-models.md`. The hosts are
    unreachable from a sandboxed build environment.
-2. Drop the GLB into `public/atlas/models/`, add a `CATALOGUE` entry.
+2. Drop the GLB into `glb-files/` and describe it in `glb-files/sources.json`
+   — filename, id, source, trilingual name and summary. The build refuses a
+   model that names no source, so nothing ships unattributed.
 3. `npm run atlas:models && npm run atlas:validate`.
 4. Update this file and the system's note in `src/data/coverage-notes.json`.
 

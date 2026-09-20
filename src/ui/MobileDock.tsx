@@ -1,4 +1,4 @@
-import { useState, type ReactNode } from 'react';
+import { useEffect, useState, type ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import { SystemRail } from './SystemRail';
 import { ModelPicker } from './ModelPicker';
@@ -24,6 +24,21 @@ export function MobileDock() {
   const [panel, setPanel] = useState<Panel>(null);
   const selected = useAtlas((s) => s.selected);
   const studyModel = useAtlas((s) => s.studyModel);
+
+  // Picking a part has to show what it is. On a phone the detail lives in a
+  // sheet, so without this the name only reaches the pane the wide layout
+  // uses — hidden here — and tapping a bone, or a search result while the
+  // model picker is still up, looks like it did nothing at all.
+  //
+  // This follows the change rather than the value: reopening on every render
+  // where something is selected would fight a reader who closed the sheet.
+  useEffect(() => {
+    let previous = useAtlas.getState().selected;
+    return useAtlas.subscribe((state) => {
+      if (state.selected && state.selected !== previous) setPanel('detail');
+      previous = state.selected;
+    });
+  }, []);
 
   // Short labels: the full words are long enough in Sinhala and Tamil to
   // break mid-word in a third-of-a-screen tab. Sheet headings use the full

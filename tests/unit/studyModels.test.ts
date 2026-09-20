@@ -13,10 +13,24 @@ describe('study model catalogue', () => {
     expect(FULL.source).toBe('open3dmodel');
   });
 
-  it('carries the five reviewed models', () => {
-    expect(FULL.models.map((m) => m.id)).toEqual([
+  it('leads with the five anatomist-reviewed models', () => {
+    // The reviewed models come first because the grade is the reason to
+    // choose between them, and a student should meet the checked ones first.
+    expect(FULL.models.slice(0, 5).map((m) => m.id)).toEqual([
       'skeleton', 'skull', 'skull-exploded', 'skull-base', 'vertebrae',
     ]);
+    expect(FULL.models.slice(0, 5).every((m) => m.grade === 'A')).toBe(true);
+  });
+
+  it('grades every model, and grades the unreviewed ones honestly', () => {
+    for (const model of FULL.models) {
+      expect(['A', 'B', 'C'], `${model.id} has grade ${model.grade}`)
+        .toContain(model.grade);
+    }
+    // Nothing may claim review it has not had.
+    for (const model of FULL.models.filter((m) => m.grade === 'A')) {
+      expect(model.credit?.reviewedBy?.trim(), `${model.id}`).toBeTruthy();
+    }
   });
 
   it('names every structure it ships', () => {

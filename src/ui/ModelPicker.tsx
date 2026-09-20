@@ -1,15 +1,16 @@
 import { useTranslation } from 'react-i18next';
 import { useAtlas } from '../state/store';
-import { modelName, modelSummary } from '../atlas/studyModels';
+import { modelName, modelSummary, type Grade } from '../atlas/studyModels';
 
 /**
- * Choose between the whole body and an anatomist-reviewed study model.
+ * Choose between the whole body and a study model.
  *
  * The grade is the point of the choice, so it is on the face of each option
- * rather than buried: the whole body is a published reference dataset that
- * no anatomist has checked structure by structure, and the study models have
- * been. A student revising for a viva wants to know which they are looking
- * at.
+ * rather than buried. The whole body is a published reference dataset no
+ * anatomist has checked structure by structure; the Open3Dmodel models have
+ * been checked; the community models are an artist's work and nobody has
+ * checked them at all. A student revising for a viva has to know which of
+ * the three they are looking at.
  */
 export function ModelPicker() {
   const { t } = useTranslation();
@@ -37,7 +38,7 @@ export function ModelPicker() {
           key={model.id}
           active={active?.id === model.id}
           onClick={() => setStudyModel(model)}
-          grade="A"
+          grade={model.grade ?? 'A'}
           title={modelName(model, lang)}
           summary={modelSummary(model, lang)}
           meta={`${model.structures.length} ${t('parts')} · ${mb(model.bytes)}`}
@@ -52,7 +53,7 @@ function Option({
 }: {
   active: boolean;
   onClick: () => void;
-  grade: 'A' | 'B';
+  grade: Grade;
   title: string;
   summary: string;
   meta: string;
@@ -73,7 +74,9 @@ function Option({
           className={`shrink-0 rounded border px-1.5 py-0.5 text-[11px] font-medium ${
             grade === 'A'
               ? 'border-emerald-700/50 bg-emerald-900/50 text-emerald-200'
-              : 'border-sky-700/50 bg-sky-900/50 text-sky-200'
+              : grade === 'B'
+                ? 'border-sky-700/50 bg-sky-900/50 text-sky-200'
+                : 'border-amber-700/50 bg-amber-900/50 text-amber-200'
           }`}
           title={t(`grade${grade}`)}
         >

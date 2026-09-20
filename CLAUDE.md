@@ -8,6 +8,8 @@ Static site, no backend. See `README.md` for what it does.
 - `docs/GAP_ANALYSIS.md` — what is missing from the datasets and why,
   verified against the shipped files rather than their documentation.
 - `docs/adding-models.md` — how to add a reviewed model.
+- `glb-files/glb-readme.md` — the drop-in folder for new GLB models, and the
+  manifest entry each one needs before the build will accept it.
 - `docs/adr/` — why things are the way they are. 0003 and 0005 cover the
   geometry decisions.
 - `data-sources.json` — every source, its licence, and the attribution its
@@ -17,7 +19,8 @@ Static site, no backend. See `README.md` for what it does.
 
 - **Never invent geometry.** Every mesh must be traceable to a source listed
   in `data-sources.json`. A plausible-looking structure no anatomist has
-  checked is worse than an absent one, because a student cannot tell.
+  checked is worse than an absent one, because a student cannot tell. The
+  `glb-files/` intake refuses any model that names no source.
 - **Never let a term claim review without a named reviewer.**
   `validate-terms.mjs` enforces this.
 - **Never add a NonCommercial asset.** One would spread its term to the whole

@@ -93,6 +93,9 @@ async function main() {
       id: m.id,
       names: m.names,
       structures: m.structures.length,
+      grade: m.grade ?? null,
+      // Each model carries its own attribution, so a student looking at one
+      // can see who made and checked it without reading the whole pack notice.
       credit: m.credit ?? null,
     })),
     references: REFERENCES,

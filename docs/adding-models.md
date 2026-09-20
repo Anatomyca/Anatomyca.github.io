@@ -23,22 +23,47 @@ done by hand.
 | `thorax`, `abdomen` | Reviewed viscera, where the body is only Grade B |
 | `head-neck` | Would supply the thyroid gland, which is absent |
 
-## 2. Drop it in and rebuild the index
+## 2. Drop it in and describe it
 
 ```bash
-cp upper-limb.glb public/atlas/models/
-npm run atlas:models     # indexes the GLB and regenerates the credits
-npm run atlas:validate    # licence, terminology and coverage gates
+cp upper-limb.glb glb-files/
+# add an entry to glb-files/sources.json keyed by the filename
+npm run atlas:models     # ingests glb-files/, regenerates the credits
+npm run atlas:validate   # licence, terminology and coverage gates
 ```
 
-`scripts/build-study-models.mjs` reads each GLB's JSON chunk for node names
-and per-mesh bounds, so nothing needs listing by hand. It will report the new
-model as unlisted until you add an entry to its `CATALOGUE` array giving the
-id, the trilingual display name and the one-line summary — that text is the
-only part a script cannot write for you.
+`glb-files/` is the intake folder, and `glb-files/glb-readme.md` documents the
+entry format. The entry names the model's `source`, which must be a key in
+`data-sources.json` — that is where the licence and the licensor's required
+attribution string live, so a model cannot claim a licence its source does not
+carry, and the wording shown to students cannot drift from what the licensor
+demands.
 
-CI runs both scripts, so a GLB added without an entry fails the build rather
-than shipping unnamed.
+`scripts/build-study-models.mjs` reads each GLB's JSON chunk for node names and
+per-mesh bounds, so no structure needs listing by hand. The trilingual display
+name and one-line summary are the only parts a script cannot write for you.
+
+Accepted files are copied into `public/atlas/models/`, which is what the app
+serves. The five models that predate the intake folder are still listed in the
+script's `CATALOGUE` array; either route works.
+
+### What the intake refuses
+
+A refusal fails the build rather than shipping something quietly wrong:
+
+- a `.glb` with no entry in `sources.json` — an unattributed mesh in a
+  CC BY-SA pack is a licence breach, and a mesh nobody can trace to a source
+  is exactly what this project promises students it does not ship;
+- an entry naming a source `data-sources.json` does not define;
+- a source whose licence is NonCommercial, or otherwise outside
+  `approvedLicences`;
+- `grade: "A"` with no named `reviewedBy`;
+- a missing Sinhala or Tamil name;
+- a file that is not a valid GLB, or whose meshes carry no names.
+
+`scripts/check-licences.mjs` repeats the attribution and licence checks, so a
+model committed without its credit fails `npm run atlas:validate` even if
+nobody reran the indexer.
 
 ## What the pipeline checks
 
