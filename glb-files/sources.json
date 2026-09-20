@@ -19,5 +19,298 @@
       "sourceUrl": "https://anatomytool.org/open3dmodel-learn"
     }
   },
-  "models": {}
+  "models": {
+    "realistic_human_lungs.glb": {
+      "id": "lungs",
+      "source": "sketchfab",
+      "grade": "C",
+      "names": {
+        "en": "Lungs",
+        "si": "පෙනහළු",
+        "ta": "நுரையீரல்கள்"
+      },
+      "summary": {
+        "en": "Both lungs as whole organs. The reference dataset has no lung tissue at all, so this is the only lung in the atlas.",
+        "si": "පෙනහළු දෙකම සම්පූර්ණ අවයව ලෙස. යොමු දත්ත කට්ටලයේ පෙනහළු පටක කිසිසේත් නොමැති බැවින්, මෙය ඇට්ලසයේ ඇති එකම පෙනහල්ලයි.",
+        "ta": "இரு நுரையீரல்களும் முழு உறுப்புகளாக. குறிப்புத் தரவுத்தொகுப்பில் நுரையீரல் திசு இல்லை, எனவே இதுவே அட்லஸில் உள்ள ஒரே நுரையீரல்."
+      },
+      "nameRules": [
+        [
+          "^.*lungh_part0*(\\d+)_0$",
+          "Lung, part $1"
+        ]
+      ]
+    },
+    "realistic_human_heart.glb": {
+      "id": "heart",
+      "source": "sketchfab",
+      "grade": "C",
+      "names": {
+        "en": "Heart",
+        "si": "හදවත",
+        "ta": "இதயம்"
+      },
+      "summary": {
+        "en": "The heart as a single external surface, showing its shape and the great vessels leaving it.",
+        "si": "හදවත තනි බාහිර පෘෂ්ඨයක් ලෙස, එහි හැඩය සහ එයින් පිටවන මහා රුධිර වාහිනී පෙන්වයි.",
+        "ta": "இதயம் ஒரு வெளிப்புற மேற்பரப்பாக, அதன் வடிவத்தையும் வெளியேறும் பெரும் நாளங்களையும் காட்டுகிறது."
+      },
+      "nameRules": [
+        [
+          "^.*$",
+          "Heart"
+        ]
+      ]
+    },
+    "human_brain.glb": {
+      "id": "brain",
+      "source": "sketchfab",
+      "grade": "C",
+      "names": {
+        "en": "Brain",
+        "si": "මොළය",
+        "ta": "மூளை"
+      },
+      "summary": {
+        "en": "The whole brain, with the gyri and sulci of the cerebral surface.",
+        "si": "සම්පූර්ණ මොළය, මස්තිෂ්ක පෘෂ්ඨයේ ඇති නැමීම් සහ සුල්කයන් සමඟ.",
+        "ta": "முழு மூளை, பெருமூளை மேற்பரப்பின் சுருள்களும் பள்ளங்களும் உடன்."
+      },
+      "nameRules": [
+        [
+          "^.*$",
+          "Brain"
+        ]
+      ]
+    },
+    "human_kidney.glb": {
+      "id": "kidney",
+      "source": "sketchfab",
+      "grade": "C",
+      "names": {
+        "en": "Kidney",
+        "si": "වකුගඩුව",
+        "ta": "சிறுநீரகம்"
+      },
+      "summary": {
+        "en": "A kidney with its vessels and ureter. The reference dataset carries only six urinary structures.",
+        "si": "වකුගඩුවක් එහි රුධිර වාහිනී සහ මූත්‍රවාහිනිය සමඟ. යොමු දත්ත කට්ටලයේ ඇත්තේ මූත්‍ර ව්‍යුහ හයක් පමණි.",
+        "ta": "ஒரு சிறுநீரகம், அதன் நாளங்கள் மற்றும் சிறுநீர்க்குழாயுடன். குறிப்புத் தரவுத்தொகுப்பில் ஆறு சிறுநீர் அமைப்புகளே உள்ளன."
+      },
+      "nameRules": [
+        [
+          "^.*Kidney.*$",
+          "Kidney"
+        ],
+        [
+          "^Group\\d+.*$",
+          "Kidney surface"
+        ]
+      ]
+    },
+    "realistic_human_eye.glb": {
+      "id": "eye",
+      "source": "sketchfab",
+      "grade": "C",
+      "names": {
+        "en": "Eye",
+        "si": "ඇස",
+        "ta": "கண்"
+      },
+      "summary": {
+        "en": "The eyeball with the optic nerve behind it.",
+        "si": "අක්ෂි ගෝලය, එය පිටුපස ඇති දෘශ්‍ය ස්නායුව සමඟ.",
+        "ta": "கண் இமை, அதன் பின்னால் பார்வை நரம்புடன்."
+      },
+      "nameRules": [
+        [
+          "^mesh_0$",
+          "Eyeball"
+        ],
+        [
+          "^Object_\\d+$",
+          "Optic nerve"
+        ]
+      ]
+    },
+    "human_mouth_detailed.glb": {
+      "id": "mouth",
+      "source": "sketchfab",
+      "grade": "C",
+      "names": {
+        "en": "Mouth and teeth",
+        "si": "මුඛය සහ දත්",
+        "ta": "வாயும் பற்களும்"
+      },
+      "summary": {
+        "en": "The oral cavity with the tongue and the full set of teeth.",
+        "si": "මුඛ කුහරය, දිව සහ සම්පූර්ණ දත් කට්ටලය සමඟ.",
+        "ta": "வாய்க்குழி, நாக்கு மற்றும் முழுப் பற்தொகுப்புடன்."
+      },
+      "nameRules": [
+        [
+          "^Object_(\\d+)$",
+          "Mouth, part $1"
+        ]
+      ]
+    },
+    "human_skeleton_named.glb": {
+      "id": "skeleton-named",
+      "source": "sketchfab",
+      "grade": "C",
+      "names": {
+        "en": "Skeleton, bone by bone",
+        "si": "අස්ථි පද්ධතිය, අස්ථියෙන් අස්ථිය",
+        "ta": "எலும்புக்கூடு, எலும்பு வாரியாக"
+      },
+      "summary": {
+        "en": "183 separately named bones, each one selectable on its own.",
+        "si": "වෙන් වෙන්ව නම් කළ අස්ථි 183ක්, එක් එක් අස්ථිය තනිව තෝරාගත හැකිය.",
+        "ta": "தனித்தனியாகப் பெயரிடப்பட்ட 183 எலும்புகள், ஒவ்வொன்றும் தனியே தேர்ந்தெடுக்கக்கூடியது."
+      },
+      "nameRules": [
+        [
+          "__0$",
+          ""
+        ],
+        [
+          "^l[_ ](.+)$",
+          "$1 (left)"
+        ],
+        [
+          "^r[_ ](.+)$",
+          "$1 (right)"
+        ]
+      ]
+    },
+    "the_human_spinal_column.glb": {
+      "id": "spinal-column",
+      "source": "sketchfab",
+      "grade": "C",
+      "names": {
+        "en": "Spinal column",
+        "si": "කශේරුක ස්තම්භය",
+        "ta": "முதுகெலும்புத் தொடர்"
+      },
+      "summary": {
+        "en": "The vertebral column with the skull and ribs, each vertebra named.",
+        "si": "කශේරුක ස්තම්භය හිස්කබල සහ ඉළ ඇට සමඟ, සෑම කශේරුකාවක්ම නම් කර ඇත.",
+        "ta": "முதுகெலும்புத் தொடர், மண்டையோடு மற்றும் விலா எலும்புகளுடன், ஒவ்வொரு முள்ளெலும்பும் பெயரிடப்பட்டுள்ளது."
+      },
+      "nameRules": [
+        [
+          "^Cylinder0*(\\d+)[_ ]discs.*$",
+          "Intervertebral disc $1"
+        ],
+        [
+          "^Cylinder0*(\\d+)_markerThorasic_0$",
+          "Region marker, thoracic $1"
+        ],
+        [
+          "^Cylinder0*(\\d+)_marker([A-Za-z]+)_0$",
+          "Region marker, $2 $1"
+        ],
+        [
+          "^Male_Skeletal_",
+          ""
+        ],
+        [
+          "_Geo_.*$",
+          ""
+        ],
+        [
+          "_Left$",
+          " (left)"
+        ],
+        [
+          "_Right$",
+          " (right)"
+        ]
+      ]
+    },
+    "human_thorax.glb": {
+      "id": "thorax",
+      "source": "sketchfab",
+      "grade": "C",
+      "names": {
+        "en": "Thorax",
+        "si": "උරස්ථය",
+        "ta": "மார்பு"
+      },
+      "summary": {
+        "en": "The chest wall, ribs and the organs inside them. The parts are not individually named.",
+        "si": "පපුවේ බිත්තිය, ඉළ ඇට සහ ඒවා තුළ ඇති අවයව. කොටස් වෙන් වෙන්ව නම් කර නොමැත.",
+        "ta": "மார்புச் சுவர், விலா எலும்புகள் மற்றும் அவற்றுள் உள்ள உறுப்புகள். பகுதிகள் தனித்தனியே பெயரிடப்படவில்லை."
+      },
+      "nameRules": [
+        [
+          "^Object_(\\d+)$",
+          "Part $1"
+        ]
+      ]
+    },
+    "human_male_and_female_pelvis.glb": {
+      "id": "pelvis",
+      "source": "sketchfab",
+      "grade": "C",
+      "names": {
+        "en": "Pelvis, male and female",
+        "si": "ශ්‍රෝණිය, පුරුෂ හා ස්ත්‍රී",
+        "ta": "இடுப்பு, ஆண் மற்றும் பெண்"
+      },
+      "summary": {
+        "en": "A male and a female pelvis side by side, where the differences matter clinically.",
+        "si": "පුරුෂ හා ස්ත්‍රී ශ්‍රෝණි දෙකක් අසල අසල, වෙනස්කම් සායනිකව වැදගත් වන තැන.",
+        "ta": "ஆண் மற்றும் பெண் இடுப்புகள் அருகருகே, வேறுபாடுகள் மருத்துவ ரீதியாக முக்கியமான இடம்."
+      },
+      "nameRules": [
+        [
+          "^Object_(\\d+)$",
+          "Part $1"
+        ]
+      ]
+    },
+    "human_axis_c2_vertebra.glb": {
+      "id": "axis-c2",
+      "source": "sketchfab",
+      "grade": "C",
+      "names": {
+        "en": "Axis (C2), in detail",
+        "si": "අක්ෂය (C2), විස්තරාත්මකව",
+        "ta": "அச்சு (C2), விரிவாக"
+      },
+      "summary": {
+        "en": "One vertebra scanned at high resolution, including the dens.",
+        "si": "ඉහළ විභේදනයකින් ස්කෑන් කළ එක් කශේරුකාවක්, දන්තය ඇතුළුව.",
+        "ta": "உயர் தெளிவுத்திறனில் வருடப்பட்ட ஒரு முள்ளெலும்பு, பல்முனை உட்பட."
+      },
+      "nameRules": [
+        [
+          "^Object_(\\d+)$",
+          "Part $1"
+        ]
+      ]
+    },
+    "female_human_skeleton_-_zbrush_-_anatomy_study.glb": {
+      "id": "skeleton-female",
+      "source": "sketchfab",
+      "grade": "C",
+      "names": {
+        "en": "Female skeleton",
+        "si": "ස්ත්‍රී අස්ථි පද්ධතිය",
+        "ta": "பெண் எலும்புக்கூடு"
+      },
+      "summary": {
+        "en": "A female skeleton. The reference body is segmented from one adult male, so proportions there are not universal.",
+        "si": "ස්ත්‍රී අස්ථි පද්ධතියක්. යොමු ශරීරය වැඩිහිටි පුරුෂයෙකුගෙන් ඛණ්ඩනය කර ඇති බැවින්, එහි අනුපාත විශ්වීය නොවේ.",
+        "ta": "ஒரு பெண் எலும்புக்கூடு. குறிப்பு உடல் ஒரு வயது வந்த ஆணிடமிருந்து பிரிக்கப்பட்டது, எனவே அதன் விகிதங்கள் உலகளாவியவை அல்ல."
+      },
+      "nameRules": [
+        [
+          "^.*$",
+          "Female skeleton"
+        ]
+      ]
+    }
+  }
 }

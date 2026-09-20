@@ -51,7 +51,7 @@
   "source": "Source",
   "gradeA": "Reviewed by anatomists",
   "gradeB": "Published reference dataset",
-  "gradeC": "Teaching shape, not dissection-grade",
+  "gradeC": "Artist's model, not checked by an anatomist",
   "provisional": "Name not yet reviewed",
   "reportError": "Report an error",
   "disclaimer": "Anatomyca is an educational reference, not a diagnostic or clinical tool. The model shows one reference anatomy and does not show every human variation.",

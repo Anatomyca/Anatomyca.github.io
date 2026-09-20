@@ -1,5 +1,5 @@
 import { useTranslation } from 'react-i18next';
-import type { Grade, SourceId } from '../domain/types';
+import type { Grade } from '../domain/types';
 
 /**
  * Every structure states how far it can be trusted.
@@ -15,15 +15,21 @@ const GRADE_STYLE: Record<Grade, string> = {
   C: 'bg-amber-900/40 text-amber-200 border-amber-700/50',
 };
 
-const SOURCE_LABEL: Record<SourceId, string> = {
+/**
+ * Display names for the sources a structure can come from. Unknown keys fall
+ * back to the key itself rather than rendering blank: a source with no label
+ * yet is still better named than not named.
+ */
+const SOURCE_LABEL: Record<string, string> = {
   'open3dmodel': 'Open3Dmodel',
   'bodyparts3d': 'BodyParts3D',
   'z-anatomy': 'Z-Anatomy',
   'hubmap': 'HuBMAP',
+  'sketchfab': 'Sketchfab',
   'anatomyca-procedural': 'Anatomyca procedural',
 };
 
-export function GradeBadge({ grade, source }: { grade: Grade; source: SourceId }) {
+export function GradeBadge({ grade, source }: { grade: Grade; source: string }) {
   const { t } = useTranslation();
   const explanation = t(`grade${grade}`);
 
@@ -37,7 +43,7 @@ export function GradeBadge({ grade, source }: { grade: Grade; source: SourceId }
       </span>
       <span className="text-muted">{explanation}</span>
       <span className="text-muted">
-        · {t('source')}: {SOURCE_LABEL[source]}
+        · {t('source')}: {SOURCE_LABEL[source] ?? source}
       </span>
     </div>
   );

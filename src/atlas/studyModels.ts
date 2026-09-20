@@ -26,9 +26,30 @@ export interface StudyStructure {
   readonly bounds: readonly [readonly number[], readonly number[]] | null;
 }
 
+/**
+ * A = checked by anatomists, B = a published reference dataset, C = an
+ * artist's model nobody has checked. The badge is shown wherever a model is
+ * offered, because a student cannot tell the three apart by looking.
+ */
+export type Grade = 'A' | 'B' | 'C';
+
+/** Who made a model, under what licence — generated per model at build time. */
+export interface StudyCredit {
+  readonly source: string;
+  readonly label: string;
+  readonly attribution: string;
+  readonly licence: string;
+  readonly licenceUrl: string;
+  readonly url: string;
+  readonly creators?: readonly string[];
+  readonly reviewedBy?: string;
+}
+
 export interface StudyModel {
   readonly id: string;
   readonly file: string;
+  readonly grade: Grade;
+  readonly credit: StudyCredit | null;
   readonly names: Readonly<Record<Language, string>>;
   readonly summary: Readonly<Record<Language, string>>;
   readonly bytes: number;
@@ -38,7 +59,7 @@ export interface StudyModel {
 
 export interface StudyCatalogue {
   readonly source: string;
-  readonly grade: 'A';
+  readonly grade: Grade;
   readonly models: readonly StudyModel[];
 }
 

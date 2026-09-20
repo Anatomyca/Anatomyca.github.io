@@ -9,7 +9,7 @@ Regenerate the counts with `node scripts/validate-atlas.mjs` and
 
 ## Verified gaps
 
-### Lungs — no lung tissue exists · **critical**
+### Lungs — no lung tissue in the reference body · **partly closed**
 
 The respiratory system holds 119 meshes:
 
@@ -30,8 +30,15 @@ the dataset has.
 > in that release. In the pack distributed by the upstream Human Atlas
 > project, they are not present. Checked directly; see the table above.
 
-**What would fill it:** AnatomyTOOL's CT-derived *Normal lungs* and *Anatomy
-of the airways* models, or a future Open3Dmodel thorax region.
+**Partly closed.** The **Lungs** study model (`realistic_human_lungs.glb`,
+CC BY 4.0, by neshallads) now gives both lungs as whole organs with the
+trachea and larynx — the only lung surface in the atlas. It is Grade C: an
+artist made it, no anatomist has checked it, and its lobes are not separated.
+The respiratory coverage note points a reader to it.
+
+**What would still fill it properly:** lobed lung geometry a specialist has
+checked — AnatomyTOOL's CT-derived *Normal lungs* and *Anatomy of the
+airways* models, or a future Open3Dmodel thorax region.
 
 ### Peripheral nerves — none exist · **critical**
 

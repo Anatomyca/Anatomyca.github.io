@@ -28,8 +28,11 @@ export function DetailSheet() {
   const bookmarks = useAtlas((s) => s.bookmarks);
   const toggleBookmark = useAtlas((s) => s.toggleBookmark);
 
-  // A study model addresses structures by mesh name, not by concept id, and
-  // its geometry is reviewed — so it reports Grade A rather than the body's B.
+  // A study model addresses structures by mesh name, not by concept id. The
+  // grade and the source come from the model itself: the Open3Dmodel ones are
+  // reviewed, the community ones are an artist's work nobody has checked, and
+  // reporting the first for the second would be exactly the false claim this
+  // atlas exists to avoid making.
   if (studyModel && selectedId) {
     const structure = studyModel.structures.find((s) => s.id === selectedId);
     if (structure) {
@@ -40,7 +43,10 @@ export function DetailSheet() {
             <p className="mt-0.5 text-sm text-muted">{modelName(studyModel, lang)}</p>
           </header>
 
-          <GradeBadge grade="A" source="open3dmodel" />
+          <GradeBadge
+            grade={studyModel.grade}
+            source={studyModel.credit?.source ?? 'open3dmodel'}
+          />
 
           <dl className="grid grid-cols-[auto_1fr] gap-x-4 gap-y-1 text-sm">
             <dt className="text-muted">Triangles</dt>

@@ -14,6 +14,10 @@
     {
       "id": "CC-BY-NC-SA-4.0",
       "reason": "Same NonCommercial problem, plus ShareAlike."
+    },
+    {
+      "id": "SKETCHFAB Standard",
+      "reason": "Sketchfab's Standard licence is proprietary: it forbids redistribution of the model file, which is exactly what a downloadable offline atlas does. Only the Creative Commons options on Sketchfab are usable."
     }
   ],
   "sources": {
@@ -104,6 +108,17 @@
       "creators": [
         "ashemag"
       ]
+    },
+    "sketchfab": {
+      "label": "Sketchfab community models",
+      "licence": "CC-BY-4.0",
+      "licenceUrl": "https://creativecommons.org/licenses/by/4.0/",
+      "attribution": "Individual models by their named Sketchfab authors, licensed under CC BY 4.0. Each model is credited to its own author in the interface.",
+      "grade": "C",
+      "url": "https://sketchfab.com/",
+      "shipped": true,
+      "perWorkAttribution": true,
+      "notes": "Artist-made models, not anatomist-reviewed and not derived from a published reference dataset, so they ship as Grade C and are labelled as artist models in the interface. Each GLB carries its author, licence and source URL in asset.extras, which build-study-models.mjs reads as the authority: a file declaring a NonCommercial or proprietary licence is refused, and a manifest that disagrees with the file is refused too. Sketchfab's own Standard licence is NOT a free licence and is excluded."
     }
   }
 }

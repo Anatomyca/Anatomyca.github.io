@@ -102,6 +102,34 @@ const CATALOGUE = [
 
 const LANGS = ['en', 'si', 'ta'];
 
+/**
+ * Sketchfab writes the author, licence and source URL into `asset.extras` of
+ * every GLB it exports. That is better evidence than anything typed into a
+ * manifest by hand, so it is read as the authority: the licence gate runs off
+ * the file's own claim, and a manifest that disagrees is refused rather than
+ * believed. It is how a NonCommercial model gets caught even if someone
+ * describes it as CC BY.
+ *
+ *   "license": "CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)"
+ *   "license": "SKETCHFAB Standard (https://sketchfab.com/licenses)"
+ */
+function embeddedCredit(gltf) {
+  const extras = gltf.asset?.extras;
+  if (!extras?.license) return null;
+  const licence = String(extras.license).split(' (')[0].trim();
+  const url = String(extras.license).match(/\((https?:\/\/[^)]+)\)/)?.[1];
+  const author = String(extras.author ?? '').split(' (')[0].trim();
+  const profile = String(extras.author ?? '').match(/\((https?:\/\/[^)]+)\)/)?.[1];
+  return {
+    licence,
+    ...(url ? { licenceUrl: url } : {}),
+    ...(author ? { author } : {}),
+    ...(profile ? { authorUrl: profile } : {}),
+    ...(extras.source ? { url: String(extras.source) } : {}),
+    ...(extras.title ? { title: String(extras.title) } : {}),
+  };
+}
+
 function glbJson(buffer) {
   const view = new DataView(buffer.buffer, buffer.byteOffset, buffer.byteLength);
   if (view.getUint32(0, true) !== 0x46546C67) throw new Error('not a GLB');
@@ -110,13 +138,31 @@ function glbJson(buffer) {
   return JSON.parse(new TextDecoder().decode(buffer.subarray(20, 20 + length)));
 }
 
-/** Meshes carry a `.l` / `.r` suffix for paired bones; keep it readable. */
-function tidy(name) {
-  return name
+/**
+ * Turn an exporter's mesh name into something a student can read.
+ *
+ * Artist models carry the anatomy in the name but wrapped in export cruft —
+ * `Male_Skeletal_Upper_Canine_Left_Geo_vray Male_Skeletal_mat_0` is a real
+ * label for a real tooth. A model may supply `nameRules`, ordered
+ * [pattern, replacement] pairs applied before the general tidying, to strip
+ * its own prefixes and suffixes.
+ *
+ * The rules only ever reformat what the artist wrote. They never expand an
+ * abbreviation into an anatomical claim: `c1` becomes `C1`, not `atlas`,
+ * because guessing at a label is the same mistake as guessing at geometry.
+ */
+function tidy(name, rules = []) {
+  let s = String(name)
     .replace(/\.l$/i, ' (left)')
-    .replace(/\.r$/i, ' (right)')
-    .replace(/\s+/g, ' ')
-    .trim();
+    .replace(/\.r$/i, ' (right)');
+
+  for (const [pattern, replacement = ''] of rules) {
+    s = s.replace(new RegExp(pattern, 'i'), replacement);
+  }
+
+  s = s.replace(/_/g, ' ').replace(/\s+/g, ' ').trim();
+  if (!s) return String(name);
+  return s.charAt(0).toUpperCase() + s.slice(1);
 }
 
 /**
@@ -155,12 +201,38 @@ async function readIntake(sources, approved, forbidden) {
       problems.push(`${file}: source "${entry.source ?? ''}" is not defined in ${SOURCES}`);
       continue;
     }
-    if (forbidden.has(source.licence)) {
-      problems.push(`${file}: ${entry.source} is ${source.licence} — ${forbidden.get(source.licence)}`);
+
+    // The file's own licence claim outranks the manifest's.
+    let embedded;
+    try {
+      embedded = embeddedCredit(glbJson(await readFile(join(INTAKE_DIR, file))));
+    } catch (err) {
+      problems.push(`${file}: cannot be read as a GLB — ${err.message}`);
       continue;
     }
-    if (!approved.has(source.licence)) {
-      problems.push(`${file}: ${entry.source} is ${source.licence}, which is not in approvedLicences`);
+    const licence = embedded?.licence ?? source.licence;
+
+    if (forbidden.has(licence)) {
+      problems.push(`${file}: the file declares ${licence} — ${forbidden.get(licence)}`);
+      continue;
+    }
+    if (!approved.has(licence)) {
+      problems.push(
+        `${file}: the file declares "${licence}", which is not in approvedLicences. ` +
+        'Only a licence that permits commercial reuse and redistribution can ship here.',
+      );
+      continue;
+    }
+    if (embedded && embedded.licence !== source.licence) {
+      problems.push(
+        `${file}: the file declares ${embedded.licence} but names source "${entry.source}", ` +
+        `which is ${source.licence}. Attribution must match what the work is actually under.`,
+      );
+      continue;
+    }
+    // CC BY requires naming the author of each work, not just the platform.
+    if (source.perWorkAttribution && !(embedded?.author || entry.author)) {
+      problems.push(`${file}: no author — ${entry.source} needs each work credited to its own creator`);
       continue;
     }
     if (!entry.id) {
@@ -177,14 +249,43 @@ async function readIntake(sources, approved, forbidden) {
       problems.push(`${file}: grade A needs a named reviewedBy, or the grade must be B`);
       continue;
     }
-    entries.push({ ...entry, file, dir: INTAKE_DIR });
+    entries.push({ ...entry, file, dir: INTAKE_DIR, embedded });
   }
 
   return { entries, problems };
 }
 
+/**
+ * What the interface shows under a model.
+ *
+ * A source like BodyParts3D is one work by one licensor, so its pinned
+ * attribution string is the whole answer. A platform like Sketchfab is not:
+ * CC BY obliges us to name the author of each individual work, so the string
+ * is composed per model from what that file declares about itself.
+ */
+function creditFor(entry, source, reviewedBy) {
+  const e = entry.embedded;
+  const author = e?.author ?? entry.author;
+
+  const attribution = source.perWorkAttribution && author
+    ? `“${e?.title ?? entry.names.en}” by ${author}, licensed under ` +
+      `${e?.licence ?? source.licence}`
+    : source.attribution;
+
+  return {
+    source: entry.source,
+    label: source.label,
+    attribution,
+    licence: e?.licence ?? source.licence,
+    licenceUrl: e?.licenceUrl ?? source.licenceUrl,
+    url: e?.url ?? entry.sourceUrl ?? source.url,
+    ...(author ? { creators: [author] } : source.creators ? { creators: source.creators } : {}),
+    ...(reviewedBy ? { reviewedBy } : {}),
+  };
+}
+
 /** Read a GLB and describe every named, mesh-bearing node in it. */
-async function indexModel(path) {
+async function indexModel(path, nameRules = []) {
   const gltf = glbJson(await readFile(path));
   const bytes = (await stat(path)).size;
 
@@ -218,7 +319,7 @@ async function indexModel(path) {
       // The mesh name is the id: it is what the runtime looks up in the
       // loaded scene, so it must be the raw name, not the tidied one.
       id: raw,
-      name: tidy(raw),
+      name: tidy(raw, nameRules),
       triangles: Math.round(triangles),
       bounds: box[0][0] === Infinity ? null : box.map((c) => c.map((n) => Math.round(n * 1e4) / 1e4)),
     });
@@ -266,7 +367,7 @@ async function main() {
       added.push(entry.file);
     }
 
-    const indexed = await indexModel(join(MODELS_DIR, entry.file));
+    const indexed = await indexModel(join(MODELS_DIR, entry.file), entry.nameRules ?? []);
     if (indexed.structures.length === 0) {
       process.stderr.write(
         `Model intake refused:\n  - ${entry.file}: no named meshes. Unnamed meshes ` +
@@ -295,18 +396,7 @@ async function main() {
       grade,
       // Attribution travels with the model, not just with the pack, so the
       // interface can credit each one where a student is looking at it.
-      credit: source
-        ? {
-            source: entry.source,
-            label: source.label,
-            attribution: source.attribution,
-            licence: source.licence,
-            licenceUrl: source.licenceUrl,
-            url: entry.sourceUrl ?? source.url,
-            ...(source.creators ? { creators: source.creators } : {}),
-            ...(reviewedBy ? { reviewedBy } : {}),
-          }
-        : null,
+      credit: source ? creditFor(entry, source, reviewedBy) : null,
       ...indexed,
     });
   }

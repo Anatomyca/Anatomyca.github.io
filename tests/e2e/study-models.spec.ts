@@ -1,11 +1,12 @@
 import { expect, test, type Page } from '@playwright/test';
 
 /**
- * The anatomist-reviewed study models.
+ * The study models: individual models a reader opens instead of the body.
  *
- * These are the Grade A half of the atlas: unlike the whole body, every
- * structure in them has been checked by a subject-expert anatomist, which is
- * what makes them usable for revision rather than orientation.
+ * They do not share a grade. The Open3Dmodel ones were checked structure by
+ * structure by anatomists; the community ones are artists' work nobody has
+ * checked. Several of these tests exist to keep the second from ever being
+ * presented as the first.
  */
 
 async function open(page: Page) {
@@ -129,4 +130,20 @@ test('credits each reviewed model where the student is reading it', async ({ pag
   await expect(panel).toContainText(/(Grade|ශ්‍රේණිය|தரம்)\s*A/);
   await expect(panel).toContainText(/Reviewed by|සමාලෝචනය කළේ|மதிப்பாய்வு செய்தவர்/);
   await expect(panel).toContainText('144');
+});
+
+test('never reports a community model as anatomist-reviewed', async ({ page }) => {
+  // The detail panel used to hardcode Grade A and Open3Dmodel for every study
+  // model, so an artist's lung claimed a review no one had done. That is the
+  // one claim this atlas must never make.
+  await open(page);
+  await showPicker(page);
+  await MODEL(/Lungs/)(page).click();
+  await page.waitForTimeout(3500);
+  await page.getByRole('button', { name: 'Lung, part 1' }).first().click();
+
+  const detail = panelOf(page);
+  await expect(detail).toContainText(/(Accuracy|නිරවද්‍යතාව|துல்லியம்)\s*C/);
+  await expect(detail).toContainText('Sketchfab');
+  await expect(detail).not.toContainText('Open3Dmodel');
 });
