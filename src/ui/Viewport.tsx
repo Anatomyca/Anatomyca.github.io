@@ -3,6 +3,7 @@ import { createScene, type AnatomyScene } from '../atlas/scene';
 import { resolve } from '../atlas/selection';
 import { loadCatalogue } from '../atlas/studyModels';
 import { useAtlas } from '../state/store';
+import { ORBIT_DIRECTION, ORBIT_STEP, ZOOM_STEP } from '../atlas/camera';
 
 /**
  * The 3D canvas.
@@ -22,6 +23,7 @@ export function Viewport() {
   const xray = useAtlas((s) => s.xray);
   const spin = useAtlas((s) => s.spin);
   const focusRequest = useAtlas((s) => s.focusRequest);
+  const camera = useAtlas((s) => s.camera);
   const select = useAtlas((s) => s.select);
   const setReady = useAtlas((s) => s.setReady);
   const setManifest = useAtlas((s) => s.setManifest);
@@ -149,6 +151,29 @@ export function Viewport() {
     const stop = setTimeout(() => clearInterval(timer), 20_000);
     return () => { cancelled = true; clearInterval(timer); clearTimeout(stop); };
   }, [focusRequest, selected]);
+  // Camera commands from the controls and the keyboard. Keyed on the nonce
+  // so pressing the same button twice moves twice.
+  useEffect(() => {
+    const scene = sceneRef.current;
+    if (!scene || !camera) return;
+    const { kind } = camera;
+    if (kind === 'zoomIn') scene.zoomBy(ZOOM_STEP.in);
+    else if (kind === 'zoomOut') scene.zoomBy(ZOOM_STEP.out);
+    else if (kind === 'reset') scene.resetView();
+    else if (kind === 'frame') {
+      const id = useAtlas.getState().selected;
+      if (id) scene.focus(id);
+      else scene.resetView();
+    } else if (kind === 'snapshot') void saveSnapshot(scene);
+    else if (kind.startsWith('view:')) {
+      scene.setView(kind.slice('view:'.length) as Parameters<typeof scene.setView>[0]);
+    } else if (kind.startsWith('orbit:')) {
+      const way = kind.slice('orbit:'.length) as keyof typeof ORBIT_DIRECTION;
+      const [theta, phi] = ORBIT_DIRECTION[way];
+      scene.orbitBy(theta * ORBIT_STEP, phi * ORBIT_STEP);
+    }
+  }, [camera]);
+
   useEffect(() => { sceneRef.current?.setIsolate(isolate); }, [isolate]);
   useEffect(() => { sceneRef.current?.setReveal(reveal); }, [reveal]);
   useEffect(() => { sceneRef.current?.setXray(xray); }, [xray]);
@@ -157,8 +182,21 @@ export function Viewport() {
   return (
     <canvas
       ref={canvasRef}
-      className="h-full w-full"
+      className="h-full w-full touch-none"
       aria-label="Three-dimensional model of the human body"
     />
   );
+}
+
+/** Hand the reader a PNG of what they are looking at. */
+async function saveSnapshot(scene: AnatomyScene): Promise<void> {
+  const blob = await scene.snapshot();
+  if (!blob) return;
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = `anatomyca-${new Date().toISOString().slice(0, 19).replace(/[:T]/g, '-')}.png`;
+  link.click();
+  // Revoking immediately can cancel the download in some browsers.
+  setTimeout(() => URL.revokeObjectURL(url), 10_000);
 }

@@ -78,5 +78,18 @@
   "grade": "Grade",
   "namedStructures": "{{count}} named structures",
   "reviewedBy": "Reviewed by",
-  "noCredit": "No source recorded for this model."
+  "noCredit": "No source recorded for this model.",
+  "zoomIn": "Zoom in",
+  "zoomOut": "Zoom out",
+  "zoom": "Zoom",
+  "fitView": "Fit to view",
+  "resetView": "Reset view",
+  "fullscreen": "Fullscreen",
+  "exitFullscreen": "Leave fullscreen",
+  "views": "Views",
+  "bottom": "Bottom",
+  "snapshot": "Save a picture",
+  "orbit": "Turn the body",
+  "clearSelection": "Clear the selection",
+  "keyboard": "Keyboard"
 }

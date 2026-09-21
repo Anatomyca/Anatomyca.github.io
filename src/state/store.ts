@@ -3,6 +3,7 @@ import type { Language } from '../domain/types';
 import type { Bp3dManifest, Bp3dPart } from '../atlas/manifest';
 import { BP3D_SYSTEMS, LITE_SYSTEMS } from '../atlas/systems';
 import { buildHash, parseHash } from './deepLink';
+import type { CameraCommand } from '../atlas/camera';
 import { buildIndex, resolve, type AtlasIndex, type Selection } from '../atlas/selection';
 import type { StudyCatalogue, StudyModel } from '../atlas/studyModels';
 
@@ -37,6 +38,13 @@ interface AtlasState {
   select(id: string | null, options?: { focus?: boolean }): void;
   /** Bumped when a selection asks the camera to move. */
   focusRequest: number;
+  /**
+   * Camera commands travel as a nonce rather than as a call, because the
+   * scene lives behind a ref in the viewport and the buttons that drive it
+   * are in other panes. Same shape as focusRequest, one step along.
+   */
+  camera: { kind: CameraCommand; nonce: number } | null;
+  runCamera: (kind: CameraCommand) => void;
   setSystemShown(system: string, shown: boolean): void;
   setLoading(system: string, loading: boolean): void;
   setIsolate(on: boolean): void;
@@ -68,6 +76,10 @@ export const useAtlas = create<AtlasState>((set, get) => ({
   xray: 0,
   spin: false,
   focusRequest: 0,
+  camera: null,
+  runCamera: (kind) => set((state) => ({
+    camera: { kind, nonce: (state.camera?.nonce ?? 0) + 1 },
+  })),
   bookmarks: new Set<string>(),
   ready: false,
   loadError: null,

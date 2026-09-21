@@ -8,6 +8,8 @@ import { ModelPicker } from './ModelPicker';
 import { StructureList } from './StructureList';
 import { LanguageSwitch } from './LanguageSwitch';
 import { Controls } from './Controls';
+import { ViewControls } from './ViewControls';
+import { useShortcuts } from './useShortcuts';
 import { MobileDock } from './MobileDock';
 import { About } from './About';
 import { useAtlas } from '../state/store';
@@ -32,6 +34,10 @@ export function App() {
   const syncFromHash = useAtlas((s) => s.syncFromHash);
   const bookmarks = useAtlas((s) => s.bookmarks);
   const setBookmarks = useAtlas((s) => s.setBookmarks);
+
+  // Camera on the keyboard. Without it the body can only be turned by
+  // dragging, which leaves a keyboard user unable to move it at all.
+  useShortcuts();
 
   // A pasted link must open on the right structure, in the right language.
   useEffect(() => {
@@ -92,8 +98,12 @@ export function App() {
               {t('buildingBody')}…
             </p>
           )}
-          {/* Floating controls would cover the body on a phone, so there they
-              live in the dock's tools sheet instead. */}
+          {/* Zoom and fit stay on screen at every width: they are the moves
+              a reader makes constantly, and burying them in a sheet costs two
+              taps each time. They are small and hug the right edge. */}
+          {ready && <ViewControls />}
+          {/* The rest would cover the body on a phone, so there they live in
+              the dock's tools sheet instead. */}
           <div className="hidden md:block"><Controls /></div>
           <div className="md:hidden"><MobileDock /></div>
         </main>
