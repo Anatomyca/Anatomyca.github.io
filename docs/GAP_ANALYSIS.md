@@ -26,6 +26,15 @@ There is no lung surface anywhere in the 2,234 meshes. Even the concept
 no lobe. Selecting a lung shows its airways and vessels, which is everything
 the dataset has.
 
+That absence used to misfile the organ as well as empty it. A concept with no
+mesh of its own is classified by what its elements are, weighted by triangles,
+and vessel geometry is tubing — finely segmented, heavy in triangles out of
+all proportion to its anatomical weight. The left lung reached 45 respiratory
+elements, 43 arterial and 36 venous, and came back **"Arteries"**; so did both
+lungs, four lobes, eleven bronchopulmonary segments and two lobes of the
+liver. The rule now prefers tissue over vessels, unless the concept names
+itself a vessel. See `systemForConcept` in `src/atlas/selection.ts`.
+
 > Some descriptions of BodyParts3D 4.0 state that segmented lungs were added
 > in that release. In the pack distributed by the upstream Human Atlas
 > project, they are not present. Checked directly; see the table above.

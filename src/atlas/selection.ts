@@ -75,6 +75,22 @@ export function buildIndex(manifest: Bp3dManifest): AtlasIndex {
  *     coronary vessel meshes than chamber meshes, but the chambers are its
  *     bulk and it is plainly cardiac.
  */
+/**
+ * Arteries and veins run through every organ, and vessel geometry is tubing:
+ * long, finely segmented, and heavy in triangles out of all proportion to its
+ * anatomical weight. Filing a concept by whichever system owns the most
+ * triangles therefore hands organs to the vasculature — the left lung reached
+ * for 45 respiratory elements, 43 arterial and 36 venous, and came back
+ * "Arteries".
+ */
+const VASCULAR_SYSTEMS = new Set(['arterial', 'venous']);
+
+/**
+ * A concept that calls itself a vessel is one. Matched on whole words so
+ * "ventricle" is not read as a vein.
+ */
+const NAMES_ITSELF_VASCULAR = /\b(arter\w*|veins?|venous|vena|aortas?|aortic|vascular|vasculature)\b/i;
+
 function systemForConcept(index: AtlasIndex, concept: Bp3dConcept): string {
   const needle = concept.name.toLowerCase();
   const named = new Map<string, number>();
@@ -91,7 +107,24 @@ function systemForConcept(index: AtlasIndex, concept: Bp3dConcept): string {
 
   const best = (tally: Map<string, number>) =>
     [...tally.entries()].sort((a, b) => b[1] - a[1])[0]?.[0];
-  return best(named) ?? best(bulk) ?? 'skeletal';
+
+  // 1. An element carrying the concept's own name settles it. "Liver" has
+  //    meshes called liver; they decide, not the portal veins around them.
+  const byName = best(named);
+  if (byName) return byName;
+
+  // 2. Otherwise the tissue decides, and vessels are not tissue. An organ the
+  //    dataset models only as its blood supply — the lung, a lobe of the
+  //    liver — still belongs with the organ, not with the supply. A concept
+  //    that names itself a vessel skips this and is filed as one.
+  if (!NAMES_ITSELF_VASCULAR.test(concept.name)) {
+    const tissue = new Map([...bulk].filter(([system]) => !VASCULAR_SYSTEMS.has(system)));
+    const byTissue = best(tissue);
+    if (byTissue) return byTissue;
+  }
+
+  // 3. Nothing but vessels, or nothing at all.
+  return best(bulk) ?? 'skeletal';
 }
 
 export function resolve(index: AtlasIndex, id: string): Selection | null {
