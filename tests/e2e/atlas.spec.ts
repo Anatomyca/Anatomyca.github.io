@@ -131,6 +131,20 @@ test('files an organ under the system a reader would expect', async ({ page }) =
   await expect(page.locator('#detail, [role=dialog]').last()).toContainText('Digestion');
 });
 
+test('files the lung under the airways, not the arteries inside it', async ({ page }) => {
+  // The dataset carries no lung tissue, so the concept reaches only vessels
+  // and bronchi — and vessel geometry is heavy enough in triangles that the
+  // lung used to come back "Arteries". Selecting it must switch on Airways,
+  // which is where its note and the rest of the system are.
+  await open(page);
+  await page.getByRole('searchbox').fill('left lung');
+  await page.getByRole('option').first().click();
+  await showDetail(page);
+  const detail = page.locator('#detail, [role=dialog]').last();
+  await expect(detail).toContainText(/Airways|වාතනාල|சுவாசப்/);
+  await expect(detail).not.toContainText('Arteries');
+});
+
 test('lists every body system, at every width', async ({ page }) => {
   await open(page);
   // Fifteen systems, each a separate download the reader chooses to make.
